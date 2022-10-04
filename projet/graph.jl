@@ -21,6 +21,12 @@ mutable struct Graph{T} <: AbstractGraph{T}
   edges::Vector{Edge{T}}
 end
 
+function Graph{T}() where T
+  name = ""
+  nodes = Vector{Node{T}}()
+  edges = Vector{Edge{T}}()
+  return Graph{T}(name, nodes, edges)
+end
 
 """Ajoute un noeud au graphe."""
 function add_node!(graph::Graph{T}, node::Node{T}) where T
