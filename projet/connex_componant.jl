@@ -16,15 +16,20 @@ end
 Renvoi la liste des noeuds de la composante connexe.
 """
 node(comp::AbstractConComp) = comp.node
-root(comp::AbstractConComp) = comp.root
+root(comp::Componant{T}) where T= comp.root
+
+function set_root!(comp::Componant{T}, n::Node{T}) where T
+    comp.root = n
+    comp
+end
 
 "
 Renvoi la racine de l'arbre auquel appartient new 
 "
 function trace_back(comp::Vector{Componant{T}}, new::Componant{T}) where T
-    current = root(new)
-    while is_different(root(current), node(current))
-        current = root(current)
+    current = new
+    while name(root(current)) != name(node(current))
+        current = get_component(comp, name(root(current)))
     end
     return current
 end
@@ -32,9 +37,9 @@ end
 """
 Renvoi le vecteur de composantes connexes decrivant un arbre couvrant auquel on a ajouté la composante connexe new a l'element i
 """
-function add!(comp::Vector{Componant{T}}, i::Int, new::Componant{T}) where T
+function add!(comp::Vector{Componant{T}}, root::Componant{T}, new::Componant{T}) where T
     push!(comp, new)
-    new.root= node(comp[i])
+    new.root= node(root)
     comp
 end
 
@@ -42,9 +47,21 @@ end
 function to_components(graph::Graph{T}) where T
     comp = Vector{Componant{T}}()
     for n in nodes(graph)
-        push!(comp, Componant(n,n))
+        push!(comp, to_component(n))
     end
     return comp
+end
+
+function to_component(n::Node{T}) where T
+    return Componant(n,n)
+end
+
+function get_component(comp::Vector{Componant{T}}, s::String) where T
+    i = findfirst(x -> ( name(node(x)) == s), comp)  
+    if i>0 
+        return comp[i] 
+    end
+    return NaN
 end
 
 @testset "struct Componant tests" begin
@@ -59,6 +76,18 @@ end
 		
 		comp = to_components(g)
         @test length(comp) == nb_nodes(g)
+        @test name(node(get_component(comp, "1"))) == name(get_node(g, "1"))
+        @test data(node(get_component(comp, "1"))) == data(get_node(g, "1"))
+       
+        set_root!(get_component(comp, "3"), node(get_component(comp, "2"))) 
+        set_root!(get_component(comp, "2"), node(get_component(comp, "1"))) 
+        trace_back(comp, get_component(comp, "3"))
+        @test name(node(trace_back(comp, get_component(comp, "3")))) == name(node(get_component(comp, "1")))
+        node4 = Node("4", 4)
+        com4 = to_component(node4)
+        add!(comp, get_component(comp, "3"), com4)
+        @test length(comp) == nb_nodes(g) + 1
+        @test name(node(trace_back(comp, get_component(comp, "4")))) == name(node(get_component(comp, "1")))
         
 	end
 	@testset "tests for special cases" begin ## loop or empty vecteur
