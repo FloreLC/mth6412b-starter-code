@@ -35,11 +35,18 @@ function trace_back(comp::Vector{Componant{T}}, new::Componant{T}) where T
 end
 
 """
-Renvoi le vecteur de composantes connexes decrivant un arbre couvrant auquel on a ajouté la composante connexe new a l'element i
+Renvoi le vecteur de composantes connexes decrivant un arbre couvrant auquel on a ajouté la composante connexe new avec pour racine la composante connexe root
 """
 function add!(comp::Vector{Componant{T}}, root::Componant{T}, new::Componant{T}) where T
     push!(comp, new)
     new.root= node(root)
+    comp
+end
+"""
+Renvoi le vecteur de composantes connexes auquel on a ajouté la composante connexe new 
+"""
+function add!(comp::Vector{Componant{T}}, new::Componant{T}) where T
+    push!(comp, new)
     comp
 end
 
@@ -58,13 +65,15 @@ end
 
 function get_component(comp::Vector{Componant{T}}, s::String) where T
     i = findfirst(x -> ( name(node(x)) == s), comp)  
-    if i>0 
-        return comp[i] 
+    if isnothing(i)
+        return i 
     end
-    return NaN
+    return comp[i]
 end
 
 @testset "struct Componant tests" begin
+    node4 = Node("4", 4)
+    com4 = to_component(node4)
 	@testset "tests general cases" begin
         g = Graph{Int}()
         for i in 1:3
@@ -83,8 +92,7 @@ end
         set_root!(get_component(comp, "2"), node(get_component(comp, "1"))) 
         trace_back(comp, get_component(comp, "3"))
         @test name(node(trace_back(comp, get_component(comp, "3")))) == name(node(get_component(comp, "1")))
-        node4 = Node("4", 4)
-        com4 = to_component(node4)
+        
         add!(comp, get_component(comp, "3"), com4)
         @test length(comp) == nb_nodes(g) + 1
         @test name(node(trace_back(comp, get_component(comp, "4")))) == name(node(get_component(comp, "1")))
@@ -92,6 +100,13 @@ end
 	end
 	@testset "tests for special cases" begin ## loop or empty vecteur
 		#@test (@test_logs (:warn,"empty graph, returns empty Vector") length(to_components(Graph{Int}()))  0)
+        g = Graph{Int}()
+        comp_g = to_components(g)
+        @test length(nodes(g)) ==  0
+        @test length(comp_g) ==  0
+        @test isnothing(get_component(comp_g, "1"))
+        add!(comp_g, com4)
+        @test length(comp_g) ==  1
     end
 
 end
