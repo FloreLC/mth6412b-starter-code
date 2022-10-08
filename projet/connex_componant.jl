@@ -74,8 +74,12 @@ function get_component_index(comp::Vector{Component{T}}, s::String) where T
     return findfirst(x -> ( name(node(x)) == s), comp)  
 end
 
+"""
+Prend en parametre un graphe g et son vecteur de composantes connexes associé.
 
-## WARNING : INFINITE loop
+Construit le graphe correspondant au sous graphe de g décrit par le vecteur de composantes connexes
+
+"""
 function to_graph(comp::Vector{Component{T}}, g::Graph{T}) where T
     tree = Graph{T}("covering tree (kruskal) of $(name(g))", copy.(nodes(g)), Vector{Edge{T}}())
     for i in 1:nb_nodes(tree)
@@ -87,6 +91,7 @@ function to_graph(comp::Vector{Component{T}}, g::Graph{T}) where T
     end
     return tree
 end
+
 """
 Prend en parametre un graphe
     - Construit un vecteur de composantes connexes telles que chaque element est un noeud du graphe avec elle meme pour racine
