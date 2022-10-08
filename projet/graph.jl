@@ -79,6 +79,15 @@ function show(graph::Graph)
 end
 
 
+""" Renvoi un objet edge du graphe g avec pour extremites n1 et n2. nothing sinon"""
+function get_edge(g::Graph{T}, n1::Node{T}, n2::Node{T}) where T
+    i = findfirst(x ->name.(ends(x)) == (name(n1), name(n2)) , edges(g))
+    if isnothing(i)
+      i = findfirst(x -> name.(ends(x)) == (name(n2), name(n1)) , edges(g))
+    end
+
+  return edges(g)[i]
+end
 
 
 """" Lis le fichier tsp et en extrait les données

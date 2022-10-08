@@ -1,4 +1,5 @@
 import Base.show
+import Base.copy
 
 """Type abstrait dont d'autres types de noeuds dériveront."""
 abstract type AbstractNode{T} end
@@ -27,8 +28,12 @@ name(node::AbstractNode) = node.name
 data(node::AbstractNode) = node.data
 
 """Affiche un noeud."""
-
-""" Ajout d'un operateur ternaire dans le cas ou le type de données soit Nothing"""
 function show(node::AbstractNode)
+  #Ajout d'un operateur ternaire dans le cas ou le type de données soit Nothing
   println("Node ", name(node), isnothing(data(node)) ? " " : " data: $(data(node))")
 end
+
+""" copy un noeud """
+Base.copy(n::AbstractNode) = Node(n.name, n.data)
+
+
