@@ -18,14 +18,17 @@ Renvoi la liste des noeuds de la composante connexe.
 node(comp::AbstractConComp) = comp.node
 root(comp::Component{T}) where T= comp.root
 
+"""
+Prend en parametre une composante connexe et un noeud n. Renvoi la composante connexe en ayant changé sa racine pour le noeud n.
+"""
 function set_root!(comp::Component{T}, n::Node{T}) where T
     comp.root = n
     comp
 end
 
-"
+"""
 Renvoi la racine de l'arbre auquel appartient new 
-"
+"""
 function trace_back(comp::Vector{Component{T}}, new::Component{T}) where T
     current = new
     while name(root(current)) != name(node(current))
@@ -63,6 +66,9 @@ function to_component(n::Node{T}) where T
     return Component(n,n)
 end
 
+""" 
+Renvoi l'element du vecteur comp tel que s est le nom du noeud de l'element.
+"""
 function get_component(comp::Vector{Component{T}}, s::String) where T
     i = findfirst(x -> ( name(node(x)) == s), comp)  
     if isnothing(i)
@@ -70,6 +76,10 @@ function get_component(comp::Vector{Component{T}}, s::String) where T
     end
     return comp[i]
 end
+
+""" 
+Renvoi l'index de l'element du vecteur comp tel que s est le nom du noeud de l'element.
+"""
 function get_component_index(comp::Vector{Component{T}}, s::String) where T
     return findfirst(x -> ( name(node(x)) == s), comp)  
 end
