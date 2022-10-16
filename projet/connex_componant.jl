@@ -176,8 +176,10 @@ end
         add_edge!(g, Edge((get_node(g, "1"), get_node(g, "2")), 1))
         add_edge!(g, Edge((get_node(g, "2"), get_node(g, "3")), 1))
         add_edge!(g, Edge((get_node(g, "1"), get_node(g, "3")), 10))
-        @test nb_nodes(kruskal(g)) == 3
-        @test nb_edges(kruskal(g)) == 2
+        tree = kruskal(g)
+        @test nb_nodes(tree) == 3
+        @test nb_edges(tree) == 2
+        @test sum(weight.(edges(tree))) == 2
         
     end
 
