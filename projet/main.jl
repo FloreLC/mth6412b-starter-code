@@ -4,8 +4,8 @@ include("./connex_componant.jl")
 
 
 
-#filename = ARGS[1]
-#g = build_graph("../../instances/stsp/$(filename)")
+filename = ARGS[1]
+g = build_graph("../instances/stsp/$(filename)")
+#show(g)
+show(kruskal(g))
 
-
-####### Build easy graph #########+++++++

@@ -37,6 +37,10 @@ function trace_back(comp::Vector{Component{T}}, new::Component{T}) where T
     return current
 end
 
+function name_root(comp::Vector{Component{T}}, new::Component{T}) where T
+    return name(node(trace_back(comp, new))) 
+end
+
 """
 Renvoi le vecteur de composantes connexes decrivant un arbre couvrant auquel on a ajouté la composante connexe new avec pour racine la composante connexe root
 """
@@ -102,6 +106,7 @@ function to_graph(comp::Vector{Component{T}}, g::Graph{T}) where T
     return tree
 end
 
+
 """
 Prend en parametre un graphe
     - Construit un vecteur de composantes connexes telles que chaque element est un noeud du graphe avec elle meme pour racine
@@ -109,21 +114,23 @@ Prend en parametre un graphe
     - retourne un objet graphe correspondant a l'arbre couvrant minimal obtenu.
 """
 function kruskal(g::Graph{T}) where T
-    comp = to_component(g)
+    comp = to_components(g)
+    edge_sorted = sort(edges(g), by=weight)
+for e in edge_sorted
+    new1 = get_component(comp, name(ends(e)[1]))
+    new2 = get_component(comp, name(ends(e)[2]))
+    if name_root(comp, new1) != name_root(comp, new2)
+        set_root!(new2, node(new1))
+    end
+end
+return to_graph(comp, g)
 
-#################################################
-#
-#              Algorithme de kruskal
-#
-#################################################
-
-    return to_graph(comp, g)
 end
 
-@testset "struct Component tests" begin
+@testset "Tests Component structure" begin
     node4 = Node("4", 4)
     com4 = to_component(node4)
-	@testset "tests general cases" begin
+	@testset "General cases" begin
         g = Graph{Int}()
         for i in 1:3
             add_node!(g, Node("$i", i))  
@@ -150,7 +157,7 @@ end
         @test nb_edges(to_graph(comp, g)) == 2
         
 	end
-	@testset "tests for special cases" begin ## loop or empty vecteur
+	@testset "Special cases" begin ## loop or empty vecteur
 		#@test (@test_logs (:warn,"empty graph, returns empty Vector") length(to_components(Graph{Int}()))  0)
         g = Graph{Int}()
         comp_g = to_components(g)
@@ -159,6 +166,19 @@ end
         @test isnothing(get_component(comp_g, "1"))
         add!(comp_g, com4)
         @test length(comp_g) ==  1
+    end
+
+    @testset "Kruskal" begin
+        g = Graph{Int}()
+        for i in 1:3
+            add_node!(g, Node("$i", i))  
+        end
+        add_edge!(g, Edge((get_node(g, "1"), get_node(g, "2")), 1))
+        add_edge!(g, Edge((get_node(g, "2"), get_node(g, "3")), 1))
+        add_edge!(g, Edge((get_node(g, "1"), get_node(g, "3")), 10))
+        @test nb_nodes(kruskal(g)) == 3
+        @test nb_edges(kruskal(g)) == 2
+        
     end
 
 end
