@@ -8,11 +8,29 @@ using InteractiveUtils
 using Test
 
 # ╔═╡ 116ec11c-2622-44ea-952e-b6bd786010b4
-include("./graph.jl");
+include("../phase 1/graph.jl");
+
+# ╔═╡ 46612913-7022-4537-a927-9fa860c8d156
+md"""
+# Rapport phase 2
+## Corrections et ameliorations apportees a la phase 1
+"""
+
+# ╔═╡ 86b0f8de-f0d6-44db-a3b7-4229610fc181
+md"""
+Suites aux corrections recues, nous avons implemente les changements suivants au fichier ../phase 1/graph.jl:
+- get_node envoi un warning et nothing si un noeud n'est pas dans le graphe
+- La mise en page de la documentation a ete corrigee
+- La fonction build_graph est maintenant dans le fichier graph.jl
+
+De plus, nous avons ameliorer, dans la fonction build_graph, la recuperation du nom du graphe. Ce n'est plus le nom du fichier avec son chemin et son extension, mais simplement le nom qui est donne au graphe.
+"""
+
+# ╔═╡ 54b1a094-56b7-49a4-834d-2a01c8c2eb27
+
 
 # ╔═╡ b010ff64-64c9-47e9-8813-7878df83f80e
 md"""
-# Rapport phase 2
 ## Composantes connexes
 ### Une nouvelle structure
 """
@@ -131,18 +149,62 @@ function get_component_index(comp::Vector{Component{T}}, s::String) where T
 end
 
 
+# ╔═╡ d2113539-e8cd-484c-9ac6-b23d1621e97f
+"""
+Renvoi true si une composante c est sa propre racine, false sinon
+"""
+function is_lonely(c::AbstractConComp)
+    return name(node(c)) == name(root(c))
+end
+
 # ╔═╡ b949b11d-704e-4d8a-ba73-0903750c8763
 md""" 
 ## Algorithme de Kruskal
 """
 
+# ╔═╡ 93915d9e-a3c5-450e-a451-653d90974228
+"""
+Prend en parametre un graphe
+    - Construit un vecteur de composantes connexes telles que chaque element est un noeud du graphe avec elle meme pour racine
+    - Applique l'algorithme de kruskal au graphe et en garde la progression dans le vecteur de composantes connexes
+    - retourne un objet graphe correspondant a l'arbre couvrant minimal obtenu.
+"""
+function kruskal(g::Graph{T}) where T
+	
+	#Construit un vecteur de composantes connexes telles que chaque element est un noeud du graphe avec elle meme pour racine
+    comp = to_components(g)
+
+	#Tri les aretes de g par poids croissant
+    edge_sorted = sort(edges(g), by=weight)
+	
+	for e in edge_sorted
+		#Recuperes la composante de chaque extremite de l'arete e
+    	new1 = get_component(comp, name(ends(e)[1]))
+    	new2 = get_component(comp, name(ends(e)[2]))
+
+    	#Si new1 et new2 ne font pas parti de la meme composante connexe
+    	if name_og_root(comp, new1) != name_og_root(comp, new2)
+			
+        	#Si new1 est sa propre racine
+        	if is_lonely(new1)
+            	set_root!(new1, node(new2))
+				
+        	#Sinon Si new2 est sa propre racine
+        	elseif is_lonely(new2)
+            	set_root!(new2, node(new1))
+        	end
+			
+    	end
+	end
+	#Renvoi le graphe construit a partir du vecteur de composantes connexes
+	return to_graph(comp, g)
+end
+
 # ╔═╡ c6e9ec94-f94a-4820-a109-0c74f18e73eb
 md"""
 ## Tests unitaires
 
-Des tests unitaires on été implémentés, en prenant en compte un petit exemple ainsi que des cas limites:
-	- Des vecteurs vides
-	- Des vecteurs de composantes connexes comportant des cycles
+Des tests unitaires on été implémentés, en prenant en compte un l'exemple ainsi que des cas limites.
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -190,6 +252,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 # ╔═╡ Cell order:
 # ╟─bc2b7bb4-8911-4c02-b81d-06a62ddce517
 # ╟─116ec11c-2622-44ea-952e-b6bd786010b4
+# ╟─46612913-7022-4537-a927-9fa860c8d156
+# ╟─86b0f8de-f0d6-44db-a3b7-4229610fc181
+# ╟─54b1a094-56b7-49a4-834d-2a01c8c2eb27
 # ╟─b010ff64-64c9-47e9-8813-7878df83f80e
 # ╟─b06cc8cf-e40c-45d1-942b-8e645b4d099c
 # ╟─33bcde19-fe4d-46de-84db-8d530ebb7085
@@ -203,7 +268,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 # ╟─ecab857c-37b1-48b3-b815-3fc5a55bc55e
 # ╟─9184c85d-d3ed-4272-97fd-02bad3d58fc7
 # ╟─b6904d0e-194f-4167-9a0a-b1acaed916cd
+# ╟─d2113539-e8cd-484c-9ac6-b23d1621e97f
 # ╟─b949b11d-704e-4d8a-ba73-0903750c8763
+# ╠═93915d9e-a3c5-450e-a451-653d90974228
 # ╟─c6e9ec94-f94a-4820-a109-0c74f18e73eb
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
