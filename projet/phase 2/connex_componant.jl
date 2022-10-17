@@ -1,6 +1,6 @@
 import Base.show
 using Test
-include("./graph.jl")
+include("../phase 1/graph.jl")
 
 """Type abstrait de composantes connexes"""
 abstract type AbstractConComp{T} end
@@ -13,9 +13,13 @@ mutable struct Component{T} <: AbstractConComp{T}
 end
 
 """
-Renvoi la liste des noeuds de la composante connexe.
+Renvoi le noeud correspondant a la composante connexe.
 """
 node(comp::AbstractConComp) = comp.node
+
+"""
+Renvoi le noeud correspondant a la racine du noeud de la composante connexe.
+"""
 root(comp::Component{T}) where T= comp.root
 
 """
@@ -27,7 +31,7 @@ function set_root!(comp::Component{T}, n::Node{T}) where T
 end
 
 """
-Renvoi la racine de l'arbre auquel appartient new 
+Renvoi la composante correspondant a la racine de l'arbre auquel appartient new 
 """
 function trace_back(comp::Vector{Component{T}}, new::Component{T}) where T
     current = new
@@ -37,8 +41,12 @@ function trace_back(comp::Vector{Component{T}}, new::Component{T}) where T
     return current
 end
 
-function name_root(comp::Vector{Component{T}}, new::Component{T}) where T
-    return name(node(trace_back(comp, new))) 
+"""
+Prend un vecteur de composantes connexes et renvoi le nom de la racine de la composante contenant new 
+"""
+function name_og_root(comp::Vector{Component{T}}, new::Component{T}) where T
+    n = name(node(trace_back(comp, new))) 
+    return n
 end
 
 """
@@ -49,6 +57,7 @@ function add!(comp::Vector{Component{T}}, root::Component{T}, new::Component{T})
     new.root= node(root)
     comp
 end
+
 """
 Renvoi le vecteur de composantes connexes auquel on a ajouté la composante connexe new 
 """
@@ -66,12 +75,15 @@ function to_components(graph::Graph{T}) where T
     return comp
 end
 
+"""
+Renvoi une composante connexe singloton correspondante au noeud n
+"""
 function to_component(n::Node{T}) where T
     return Component(n,n)
 end
 
 """ 
-Renvoi l'element du vecteur comp tel que s est le nom du noeud de l'element.
+Renvoi l'element du vecteur comp tel que s est le nom du noeud de la composante.
 """
 function get_component(comp::Vector{Component{T}}, s::String) where T
     i = findfirst(x -> ( name(node(x)) == s), comp)  
@@ -82,7 +94,7 @@ function get_component(comp::Vector{Component{T}}, s::String) where T
 end
 
 """ 
-Renvoi l'index de l'element du vecteur comp tel que s est le nom du noeud de l'element.
+Renvoi l'index de l'element du vecteur comp tel que s est le nom du noeud de la composante.
 """
 function get_component_index(comp::Vector{Component{T}}, s::String) where T
     return findfirst(x -> ( name(node(x)) == s), comp)  
@@ -90,14 +102,14 @@ end
 
 """
 Prend en parametre un graphe g et son vecteur de composantes connexes associé.
-
 Construit le graphe correspondant au sous graphe de g décrit par le vecteur de composantes connexes
 
 """
 function to_graph(comp::Vector{Component{T}}, g::Graph{T}) where T
+
     tree = Graph{T}("covering tree (kruskal) of $(name(g))", copy.(nodes(g)), Vector{Edge{T}}())
     for i in 1:nb_nodes(tree)
-         current=comp[i]
+        current=comp[i]
         if name(root(current)) != name(node(current))
             e = get_edge(g, root(current), node(current))
             push!(edges(tree), Edge{T}((root(current), node(current)), weight(e)))
@@ -106,6 +118,12 @@ function to_graph(comp::Vector{Component{T}}, g::Graph{T}) where T
     return tree
 end
 
+"""
+Renvoi true si c est sa propre racine, false sinon
+"""
+function is_lonely(c::AbstractConComp)
+    return name(node(c)) == name(root(c))
+end
 
 """
 Prend en parametre un graphe
@@ -119,12 +137,20 @@ function kruskal(g::Graph{T}) where T
 for e in edge_sorted
     new1 = get_component(comp, name(ends(e)[1]))
     new2 = get_component(comp, name(ends(e)[2]))
-    if name_root(comp, new1) != name_root(comp, new2)
-        set_root!(new2, node(new1))
+
+    #Si les composantes new1 et new2 ne font pas parti de la meme composante connexe
+    if name_og_root(comp, new1) != name_og_root(comp, new2)
+        #Si new1 est sa propre racine
+        if is_lonely(new1)
+            set_root!(new1, node(new2))
+        #Sinon Si new2 est sa propre racine
+        elseif is_lonely(new2)
+            set_root!(new2, node(new1))
+        end
     end
 end
-return to_graph(comp, g)
 
+return to_graph(comp, g)
 end
 
 @testset "Tests Component structure" begin
@@ -164,22 +190,38 @@ end
         @test length(nodes(g)) ==  0
         @test length(comp_g) ==  0
         @test isnothing(get_component(comp_g, "1"))
+        tree = kruskal(g)
+        @test sum(weight.(edges(tree))) == 0 
         add!(comp_g, com4)
         @test length(comp_g) ==  1
     end
 
     @testset "Kruskal" begin
-        g = Graph{Int}()
-        for i in 1:3
-            add_node!(g, Node("$i", i))  
+        @testset "Exemple du cours" begin
+            g = Graph{Char}()
+            for i in 1:9
+                n = Node(string('a' + i-1), 'a' + i-1)
+                add_node!(g, n)
+            end
+            add_edge!(g, Edge((get_node(g, "a"), get_node(g, "b")), 4))
+            add_edge!(g, Edge( (get_node(g, "a"), get_node(g, "h")), 8))
+            add_edge!(g, Edge((get_node(g, "b"), get_node(g, "h")), 11))
+            add_edge!(g, Edge((get_node(g, "b"), get_node(g, "c")), 8))
+            add_edge!(g, Edge((get_node(g, "h"), get_node(g, "i")), 7))
+            add_edge!(g, Edge((get_node(g, "g"), get_node(g, "h")), 1))
+            add_edge!(g, Edge((get_node(g, "i"), get_node(g, "g")), 6))
+            add_edge!(g, Edge((get_node(g, "i"), get_node(g, "c")), 2))
+            add_edge!(g, Edge((get_node(g, "g"), get_node(g, "f")), 2))
+            add_edge!(g, Edge((get_node(g, "c"), get_node(g, "f")), 4))
+            add_edge!(g, Edge((get_node(g, "c"), get_node(g, "d")), 7))
+            add_edge!(g, Edge((get_node(g, "d"), get_node(g, "f")), 14))
+            add_edge!(g, Edge((get_node(g, "d"), get_node(g, "e")), 9))
+            add_edge!(g, Edge((get_node(g, "f"), get_node(g, "e")), 10))
+            tree = kruskal(g)
+            @test sum(weight.(edges(tree))) == 37
+            @test length(nodes(tree)) == length(nodes(g))
+            @test length(edges(tree)) == 8
         end
-        add_edge!(g, Edge((get_node(g, "1"), get_node(g, "2")), 1))
-        add_edge!(g, Edge((get_node(g, "2"), get_node(g, "3")), 1))
-        add_edge!(g, Edge((get_node(g, "1"), get_node(g, "3")), 10))
-        tree = kruskal(g)
-        @test nb_nodes(tree) == 3
-        @test nb_edges(tree) == 2
-        @test sum(weight.(edges(tree))) == 2
         
     end
 
