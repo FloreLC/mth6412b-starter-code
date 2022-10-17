@@ -1,5 +1,4 @@
 import Base.show
-
 include("./edge.jl")
 """Type abstrait dont d'autres types de graphes dériveront."""
 abstract type AbstractGraph{T} end
@@ -107,15 +106,15 @@ Pour lancer le programme:
 function build_graph(filename::String)
   graph_nodes, graph_edges, edges_brut, weights = read_stsp(filename)
   header = read_header(filename)
-
+  graph_name = split( last(split(filename, "/")), ".")[1]
   ### Construire les nodes
   if header["DISPLAY_DATA_TYPE"] == "TWOD_DISPLAY" || header["DISPLAY_DATA_TYPE"] == "COORD_DISPLAY"
-      g = Graph{Vector{Float64}}(filename, Vector{Node}(), Vector{Edge}())
+      g = Graph{Vector{Float64}}(graph_name, Vector{Node}(), Vector{Edge}())
       for n in keys(graph_nodes)
           add_node!(g, Node("$(n)", graph_nodes[n]))
       end
   else
-      g = Graph{Nothing}(filename, Vector{Node}(), Vector{Edge}())
+      g = Graph{Nothing}(graph_name, Vector{Node}(), Vector{Edge}())
       for i in 1:parse(Int, header["DIMENSION"])
           add_node!(g, Node("$(i)", nothing))
       end

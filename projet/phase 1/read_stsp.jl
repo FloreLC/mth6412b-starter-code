@@ -182,8 +182,8 @@ function read_stsp(filename::String)
 
   Base.print("Reading of nodes : ")
   graph_nodes = read_nodes(header, filename)
-  @show "nodes in func"
-  @show graph_nodes
+  #@show "nodes in func"
+  #@show graph_nodes
   println("✓")
 
   Base.print("Reading of edges : ")
