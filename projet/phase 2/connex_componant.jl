@@ -132,25 +132,34 @@ Prend en parametre un graphe
     - retourne un objet graphe correspondant a l'arbre couvrant minimal obtenu.
 """
 function kruskal(g::Graph{T}) where T
+	
+	#Construit un vecteur de composantes connexes telles que chaque element est un noeud du graphe avec elle meme pour racine
     comp = to_components(g)
+
+	#Tri les aretes de g par poids croissant
     edge_sorted = sort(edges(g), by=weight)
-for e in edge_sorted
-    new1 = get_component(comp, name(ends(e)[1]))
-    new2 = get_component(comp, name(ends(e)[2]))
+	
+	for e in edge_sorted
+		#Recuperes la composante de chaque extremite de l'arete e
+    	new1 = get_component(comp, name(ends(e)[1]))
+    	new2 = get_component(comp, name(ends(e)[2]))
 
-    #Si les composantes new1 et new2 ne font pas parti de la meme composante connexe
-    if name_og_root(comp, new1) != name_og_root(comp, new2)
-        #Si new1 est sa propre racine
-        if is_lonely(new1)
-            set_root!(new1, node(new2))
-        #Sinon Si new2 est sa propre racine
-        elseif is_lonely(new2)
-            set_root!(new2, node(new1))
-        end
-    end
-end
-
-return to_graph(comp, g)
+    	#Si new1 et new2 ne font pas parti de la meme composante connexe
+    	if name_og_root(comp, new1) != name_og_root(comp, new2)
+			
+        	#Si new1 est sa propre racine
+        	if is_lonely(new1)
+            	set_root!(new1, node(new2))
+				
+        	#Sinon Si new2 est sa propre racine
+        	elseif is_lonely(new2)
+            	set_root!(new2, node(new1))
+        	end
+			
+    	end
+	end
+	#Renvoi le graphe construit a partir du vecteur de composantes connexes
+	return to_graph(comp, g)
 end
 
 @testset "Tests Component structure" begin
