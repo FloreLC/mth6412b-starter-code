@@ -137,3 +137,13 @@ function build_graph(filename::String)
   end
   return g
 end
+
+function get_associated_edges(g::AbstractGraph, n::AbstractNode)
+  e_with_n = Vector{AbstractEdge}()
+  for e in edges(g)
+    if name(ends(e)[1]) == name(n) || name(ends(e)[2]) == name(n)
+      push!(e_with_n, e)
+    end
+  end
+  return e_with_n
+end
