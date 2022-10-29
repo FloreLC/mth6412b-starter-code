@@ -67,7 +67,7 @@ function add!(comp::Vector{Component{T}}, new::Component{T}) where T
 end
 
 """Renvoi le vecteur des composantes connexes associees a un graphe. Il y en a autant que de nodes dans le graphe"""
-function to_components(graph::Graph{T}) where T
+function to_con_components(graph::Graph{T}) where T
     comp = Vector{Component{T}}()
     for n in nodes(graph)
         push!(comp, to_component(n))
@@ -134,7 +134,7 @@ Prend en parametre un graphe
 function kruskal(g::Graph{T}) where T
 	
 	#Construit un vecteur de composantes connexes telles que chaque element est un noeud du graphe avec elle meme pour racine
-    comp = to_components(g)
+    comp = to_con_components(g)
 
 	#Tri les aretes de g par poids croissant
     edge_sorted = sort(edges(g), by=weight)
