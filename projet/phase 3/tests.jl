@@ -63,7 +63,6 @@ using Test
     add_edge!(g, Edge((get_node(g, "f"), get_node(g, "e")), 10))
     @testset "Kruskal" begin
         @testset "Exemple du cours" begin
-            
             tree = kruskal(g)
             @test sum(weight.(edges(tree))) == 37
             @test length(nodes(tree)) == length(nodes(g))
