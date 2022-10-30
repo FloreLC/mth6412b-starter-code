@@ -1,4 +1,5 @@
-include("./new_connex.jl")
+include("./heuristic1.jl")
+include("./heuristic2.jl")
 include("./prim.jl")
 include("../phase 1/graph.jl")
 
@@ -25,10 +26,18 @@ using Test
     add_edge!(g, Edge((get_node(g, "f"), get_node(g, "e")), 10))
     @testset "Kruskal" begin
         @testset "Exemple du cours" begin
-            tree = new_kruskal(g)
+            tree_k = kruskal(g)
+            @test sum(weight.(edges(tree_k))) == 37
+            @test length(nodes(tree_k)) == length(nodes(g))
+            @test length(edges(tree_k)) == 8
+            tree = kruskal_heur1(g)
             @test sum(weight.(edges(tree))) == 37
             @test length(nodes(tree)) == length(nodes(g))
             @test length(edges(tree)) == 8
+            tree_h2 = kruskal_heur2(g)
+            @test sum(weight.(edges(tree_h2))) == 37
+            @test length(nodes(tree_h2)) == length(nodes(g))
+            @test length(edges(tree_h2)) == 8
             tree_prim = prim(g)
             @test sum(weight.(edges(tree_prim))) == 37
             @test length(nodes(tree_prim)) == length(nodes(g))
