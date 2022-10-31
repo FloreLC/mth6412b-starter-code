@@ -231,7 +231,6 @@ end
 # ╔═╡ 9a18ce8d-00dd-4b8f-9f18-acf0c6f9d6c0
 md""" 
 -on a utilisé une fonction renvoi si les deux composantes ont la meme racine (et donc sont identiques) ou non.\
--* ici pour quoi vous avez ajouter cette fonction :::\
 -Prend en parametre un graphe et renvoi un graphe qui en est un arbre couvrant a cout minimum en utilisant l'algorithme de Kruskal muni de l'heuristique 2 (compression des chemins).
 --les modifications sont faites dans la boucle for.
 """
