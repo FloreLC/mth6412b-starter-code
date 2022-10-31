@@ -46,10 +46,8 @@ function prim(g::Graph{T}) where T
     edges_selected = Vector{Edge{T}}()
 
     #Toutes les aretes sont dans une queue de priorite. Le poids de l'arete sert d'indice de priorité. Plus l'arete est legere, plus elle est prioritaire
-    edges_candidates = PriorityQueue{Edge{T}, Float64}(Base.Order.Reverse)
-    for e in edges(g)
-        enqueue!(edges_candidates, e, weight(e))
-    end
+    edges_sorted = MutableBinaryHeap{Edge{T}}(Base.By(weight))
+    
     #on choisi au hasard une racine
     current_node = nodes(g)[rand(1:nb_nodes(g))]
     #On garde en memoire les noeuds couverts par l'arbre
@@ -64,19 +62,15 @@ function prim(g::Graph{T}) where T
         if node_updated
             #On cherche toutes les aretes incidentes au noeud qu<on vient d'ajouter
             for e in get_all_edges_with_node(g, current_node)
-                #On change la priorité de cette arete pour 1/le poids (elle devient donc PLUS prioritaire)
-                #On assume ici que le poid des aretes est superieur ou egal a 1 (ce qui est possible wlog)
-                edges_candidates[e] = 1/weight(e)
+                push!(edges_sorted, e)
              end
         end
         node_updated = false
         #On recupere l'arete la moins chere ATTEIGNABLE
-        new_edge = dequeue!(edges_candidates) 
+        new_edge = pop!(edges_sorted) 
        
         #On identifi quel noeud est ajouté avec l'ajout de cet arete
         new_node = node_to_add(nodes_added, new_edge)
-  
-
         if !(isnothing(new_node))
             #On ajoute l'arete a l'arbre
             push!(edges_selected, new_edge)

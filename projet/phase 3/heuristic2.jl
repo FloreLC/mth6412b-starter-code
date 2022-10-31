@@ -1,6 +1,7 @@
 include("./new_connex.jl")
 
 
+
 """Type représentant une composante connexe comme un vecteur de noeuds, un entier (le rang de la racine) et la racine de cette composante (un noeud)
 """
 mutable struct Component_root{T} <: AbstractComp{T}
