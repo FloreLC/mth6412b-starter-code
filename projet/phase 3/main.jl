@@ -5,7 +5,7 @@ include("./heuristic1.jl")
 include("heuristic2.jl")
 
 using BenchmarkTools
-using ProfileView
+
 
 
 filename = ARGS[1]
@@ -18,8 +18,8 @@ tree_kruskal= kruskal(graph)
 println("Poids: ", sum(weight.(edges(tree_kruskal))))
 b = @benchmark kruskal(graph)
 show(io, MIME("text/plain"), b)
-# @profview kruskal(graph)
-# readline()
+
+
 
 println("\n kruskal_heuristique 1")
 tree_kruskal_heur = kruskal_heur1(graph)
@@ -40,3 +40,4 @@ tree_prim = prim(graph)
 println("Poids: ", sum(weight.(edges(tree_prim))))
 b = @benchmark prim(graph)
 show(io, MIME("text/plain"), b)
+# readline()

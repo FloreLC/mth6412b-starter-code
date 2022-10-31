@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.11
+# v0.19.12
 
 using Markdown
 using InteractiveUtils
@@ -286,7 +286,7 @@ end
 """
 
 # ╔═╡ 317b4f6a-8c87-4e02-a810-a0208b3ffba7
-md""" ## Aalgorithme de Prim """
+md""" ## Algorithme de Prim """
 
 # ╔═╡ 4e703fcc-25c8-4775-90c3-845196647c6b
 md""" Pour l'implémentation de cet algorithme des Fonctions utilitaires sont utilisées"""
@@ -357,7 +357,7 @@ function prim(g::Graph{T}) where T
     
     edges_selected = Vector{Edge{T}}()
 
-    #Toutes les aretes sont dans une queue de priorite. Le poids de l'arete sert d'indice de priorité. Plus l'arete est legere, plus elle est prioritaire
+    #Toutes les aretes sont dans une structure mutable ordonnee. Le poids de l'arete sert d'indice de priorité. Plus l'arete est legere, plus elle est prioritaire
     edges_sorted = MutableBinaryHeap{Edge{T}}(Base.By(weight))
     
     #on choisi au hasard une racine
@@ -405,7 +405,30 @@ md"""
 Des tests unitaires on été implémentés, en prenant en compte un l'exemple ainsi que des cas limites.
 """
 
+# ╔═╡ 331d5a99-2c8d-411a-a609-6747082b5a59
+md"""
+## Main
+L'execution de la commande 
+```shell
+julia main.jl $(instance)
+```
+produit en output le benchmark de chacunes de trois implementations de l'algorithme de Kruskal et de l'algorithme de Prim.
+"""
+
 # ╔═╡ 43fc6254-64e4-4db3-93be-c98265ecb791
+md"""
+Pour toutes les instances symetriques, les resultats sont comparables:
+- Les heuristiques de Kruskal permettent de diminuer le temps d'execution. C'est surtout la memoire allouee et le nombre d'allocation qui diminu drastiquement (du simple - kruskal_heur2 - au triple - kruskal -)
+- L'algorithme de Prim implemente ainsi semble particulierement moins efficace que l'algorithme de Kruskal; meme sans heuristiques.
+"""
+
+# ╔═╡ f0435117-b50d-4bc5-acef-689fae0c3d9e
+
+
+# ╔═╡ 229e54ce-2f4d-4752-a498-b4fbe1a852fd
+
+
+# ╔═╡ c94dffe8-40db-4874-aad3-b546cff0b4a6
 
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -417,7 +440,7 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.1"
+julia_version = "1.7.3"
 manifest_format = "2.0"
 project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 
@@ -428,7 +451,7 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─1157d220-592a-11ed-1825-29094a4fcc68
 # ╟─7ebdf853-823a-4fa7-99f2-acfbba841702
 # ╟─ae835729-49f7-4015-ba7d-9ae0f1568c2d
-# ╠═2ce97035-1a35-4c5d-8986-c318411b5f9a
+# ╟─2ce97035-1a35-4c5d-8986-c318411b5f9a
 # ╟─58251d14-4133-48e9-825f-fed35ef2b274
 # ╟─091f9dc3-fb9b-42a8-9222-9b76f34e4a0d
 # ╟─86c0daa1-93b7-4a82-8a59-852bf29815ee
@@ -443,14 +466,14 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─9e14296c-89c1-4a0f-aff9-34aec5f040f7
 # ╟─789ee4ba-a0fe-44db-a5a6-fc2dce7a80aa
 # ╟─05d5b159-9ce6-4b2d-b245-ffdb5e0f3cc4
-# ╠═eda7f02a-8300-4fff-8958-2450e2df53f3
+# ╟─eda7f02a-8300-4fff-8958-2450e2df53f3
 # ╟─cffc2390-5661-4303-856c-86507354cc7d
 # ╟─4fb4ac52-3028-46db-8de1-6185b794b168
 # ╟─312dc382-4e66-4ae4-82a5-6e1fe7e114e3
 # ╟─9a18ce8d-00dd-4b8f-9f18-acf0c6f9d6c0
 # ╟─205c5fb7-b39f-48c3-884c-ca734bf6b23a
 # ╟─c688326a-9ffe-47d8-ab59-65e78bb96fdb
-# ╟─317b4f6a-8c87-4e02-a810-a0208b3ffba7
+# ╠═317b4f6a-8c87-4e02-a810-a0208b3ffba7
 # ╟─4e703fcc-25c8-4775-90c3-845196647c6b
 # ╟─32bc9b3b-3630-4114-804c-57ed9031a1d5
 # ╟─0cca8654-3434-42e1-ab86-98021a6a6574
@@ -460,6 +483,10 @@ project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
 # ╟─87e773e7-6766-4fa6-bce7-113006850e34
 # ╟─b5933bdc-1174-44ea-bc18-4d269eb3e3a0
 # ╟─19f06c41-1dff-4f9a-a4ef-b1304356a960
-# ╠═43fc6254-64e4-4db3-93be-c98265ecb791
+# ╟─331d5a99-2c8d-411a-a609-6747082b5a59
+# ╟─43fc6254-64e4-4db3-93be-c98265ecb791
+# ╟─f0435117-b50d-4bc5-acef-689fae0c3d9e
+# ╟─229e54ce-2f4d-4752-a498-b4fbe1a852fd
+# ╟─c94dffe8-40db-4874-aad3-b546cff0b4a6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
