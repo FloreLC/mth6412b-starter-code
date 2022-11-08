@@ -18,6 +18,13 @@ mutable struct Node{T} <: AbstractNode{T}
   data::T
 end
 
+
+mutable struct Node_d{T} <: AbstractNode{T}
+  name::String
+  data::T
+  degree::Int
+end
+
 # on présume que tous les noeuds dérivant d'AbstractNode
 # posséderont des champs `name` et `data`.
 
