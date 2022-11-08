@@ -7,10 +7,15 @@ abstract type AbstractComp{T} end
 
 """Type composante connexe: un dictionnaire ou chaque clef est un noeud, et chaque valeur son parent"""
 mutable struct Component{T} <: AbstractComp{T}
-    nodes::Dict{Node{T}, Node{T}}
+    # this adds the degree of the node that is going to be used as a constraint to construct the 1-tree
+    # this might take the value 0, 1 or 2 in a 1-tree scheme
+    nodes::Dict{Node{T}, Tuple{Node{T}, Int8}}
 end
 
-nodes(c::AbstractComp) = c.nodes 
+# it gets the node within the component
+nodes(c::AbstractComp) = c.nodes
+# it gets the vector of degrees
+degree(c::AbstractComp) = c.degree
 
 """
 Prend en argument un graphe et renvoi un vecteur de composantes connexes initiales (noeud n => noeud n)
@@ -52,10 +57,21 @@ Joins la composante connexe comp2 a la composante connexe comp1 en les liant au 
 function add_nodes_at!(comp1::AbstractComp{T}, comp2::AbstractComp{T}, e::AbstractEdge{T}) where T
     new1, new2 = ends(e)
     if haskey(nodes(comp1),new1)
+        # add starting node to the component
         nodes(comp1)[new1] = new2
+        #################################################
+        # increases the degree of the node recently added
+        #################################################
+        degree(comp1)[new1] = degree(comp1)[new1] + 1
     elseif haskey(nodes(comp1),new2)
+        # add destination node to the component
         nodes(comp1)[new2] = new1
+        #################################################
+        # increases the degree of the node recently added
+        #################################################
+        degree(comp1)[new2] = degree(comp2)[new2] + 1
     end
+    # is this loop necessary?
     for (k,v) in nodes(comp2)
         nodes(comp1)[k] = v
     end
@@ -82,21 +98,28 @@ end
 Prend en parametre un graphe et renvoi un arbre couvrant de poids minimum en utilisant l'algorithme de Kruskal
 """
 function kruskal(g::Graph{T}) where T
-#Tri les aretes de g par poids croissant
-edge_sorted = sort(edges(g), by=weight)
-tree_comps = to_components(g)
-#garde en memoire les aretes selectionnees pour l'arbre
-edges_selected = Vector{Edge{T}}()
-for e in edge_sorted
-    (new1, new2) = ends(e)
-    comp1 = get_component_with_node(tree_comps, new1)
-    comp2 = get_component_with_node(tree_comps, new2)
-    if !same_component(comp1, comp2)
-        push!(edges_selected, e)
-        add_nodes_at!(comp1, comp2, e)
-        empty!(comp2)
+    #Tri les aretes de g par poids croissant
+    edge_sorted = sort(edges(g), by=weight)
+    tree_comps = to_components(g)
+    #garde en memoire les aretes selectionnees pour l'arbre
+    edges_selected = Vector{Edge{T}}()
+    for e in edge_sorted
+        (new1, new2) = ends(e)
+        comp1 = get_component_with_node(tree_comps, new1)
+        comp2 = get_component_with_node(tree_comps, new2)
+        #################################################
+        # if one of the nodes already have a degree 2,
+        # then skip this immediately
+        #################################################
+        if degree(comp1)[new1] == 2 || degree(comp2)[new2] == 2
+            continue
+        else
+            if !same_component(comp1, comp2)
+                push!(edges_selected, e)
+                add_nodes_at!(comp1, comp2, e)
+                empty!(comp2)
+            end
+        end
     end
+    return Graph{T}("Kruskal de $(name(g))", nodes(g), edges_selected)
 end
-return Graph{T}("Kruskal de $(name(g))", nodes(g), edges_selected)
-end
-

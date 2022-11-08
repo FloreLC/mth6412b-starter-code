@@ -16,8 +16,10 @@ Attention, tous les noeuds doivent avoir des données de même type.
 """
 mutable struct Graph{T} <: AbstractGraph{T}
   name::String
-  nodes::Vector{Node{T}}
-  edges::Vector{Edge{T}}
+  #nodes::Vector{Node{T}}
+  nodes::Vector{AbstractNode{T}}
+  #edges::Vector{Edge{T}}
+  edges::Vector{AbstractEdge{T}}
 end
 
 function Graph{T}() where T
