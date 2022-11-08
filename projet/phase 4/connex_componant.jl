@@ -14,7 +14,6 @@ end
 
 # it gets the node within the component
 nodes(c::AbstractComp) = c.nodes
-# it gets the vector of degrees
 
 """
 Gives back the degree of a node n in componant c, 0n if the node is not part of the componant
