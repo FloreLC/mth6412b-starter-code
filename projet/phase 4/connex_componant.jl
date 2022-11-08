@@ -15,8 +15,17 @@ end
 # it gets the node within the component
 nodes(c::AbstractComp) = c.nodes
 # it gets the vector of degrees
-degree(c::AbstractComp) = c.degree
 
+"""
+Gives back the degree of a node n in componant c, 0n if the node is not part of the componant
+"""
+function degree(c::AbstractComp, n::Node{T}) 
+    if haskey(c, n)
+        tmp, d = c[n]
+        return d
+    end
+    return 0
+end
 """
 Prend en argument un graphe et renvoi un vecteur de composantes connexes initiales (noeud n => noeud n)
 """
