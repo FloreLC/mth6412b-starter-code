@@ -18,12 +18,20 @@ nodes(c::AbstractComp) = c.nodes
 """
 Gives back the degree of a node n in componant c, 0n if the node is not part of the componant
 """
-function degree(c::AbstractComp, n::Node{T}) 
+function degree(c::AbstractComp, n::Node{T}) where T
     if haskey(c, n)
         tmp, d = c[n]
         return d
     end
     return 0
+end
+
+
+function set_degree!(c::AbstractComp, n::Node{T}, new_degree::Int8) where T
+    if haskey(c, n)
+        c[n] = (n, new_degree)
+    end
+    c
 end
 """
 Prend en argument un graphe et renvoi un vecteur de composantes connexes initiales (noeud n => noeud n)
@@ -31,8 +39,8 @@ Prend en argument un graphe et renvoi un vecteur de composantes connexes initial
 function to_components(g::Graph{T}) where T
     tmp = Vector{Component{T}}()
     for n in nodes(g)
-        d= Dict{Node{T}, Node{T}}()
-        d[n] = n
+        d= Dict{Node{T}, (Node{T}, Int8)}()
+        d[n] = (n, 0)
         solo = Component{T}(d)
         push!(tmp, solo)
     end
@@ -43,7 +51,7 @@ end
 Vide une composante connexe de ces noeuds
 """
 function empty!(comp::AbstractComp{T}) where T
-    comp.nodes = Dict{Node{T}, Node{T}}()
+    comp.nodes = Dict{Node{T}, (Node{T}, Int8)}()
     comp
 end
 
@@ -70,14 +78,14 @@ function add_nodes_at!(comp1::AbstractComp{T}, comp2::AbstractComp{T}, e::Abstra
         #################################################
         # increases the degree of the node recently added
         #################################################
-        degree(comp1)[new1] = degree(comp1)[new1] + 1
+        set_degree!(comp1, new1, degree(comp1, new1) + 1)
     elseif haskey(nodes(comp1),new2)
         # add destination node to the component
         nodes(comp1)[new2] = new1
         #################################################
         # increases the degree of the node recently added
         #################################################
-        degree(comp1)[new2] = degree(comp2)[new2] + 1
+        set_degree!(comp1, new2, degree(comp2, new2) + 1)
     end
     # is this loop necessary?
     for (k,v) in nodes(comp2)
