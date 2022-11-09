@@ -94,7 +94,7 @@ for e in edge_sorted
     if !same_component(comp1, comp2)
         push!(edges_selected, e)
         add_nodes_at!(comp1, comp2, e)
-        empty!(comp2)
+        #empty!(comp2)
     end
 end
 return Graph{T}("Kruskal de $(name(g))", nodes(g), edges_selected)

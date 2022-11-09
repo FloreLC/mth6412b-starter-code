@@ -1,6 +1,6 @@
 include("../phase 1/graph.jl")
-include("./new_connex.jl")
-
+#include("./new_connex.jl")
+include("../phase 4/connex_componant.jl")
 using DataStructures
 using Test
 
@@ -62,6 +62,7 @@ function prim(g::Graph{T}) where T
         if node_updated
             #On cherche toutes les aretes incidentes au noeud qu<on vient d'ajouter
             for e in get_all_edges_with_node(g, current_node)
+                ##TODO check that both ends have a degree of 0 or 1 in  the current tree
                 push!(edges_sorted, e)
              end
         end

@@ -16,10 +16,10 @@ Attention, tous les noeuds doivent avoir des données de même type.
 """
 mutable struct Graph{T} <: AbstractGraph{T}
   name::String
-  #nodes::Vector{Node{T}}
-  nodes::Vector{AbstractNode{T}}
-  #edges::Vector{Edge{T}}
-  edges::Vector{AbstractEdge{T}}
+  nodes::Vector{Node{T}}
+  #nodes::Vector{AbstractNode{T}}
+  edges::Vector{Edge{T}}
+  #edges::Vector{AbstractEdge{T}}
 end
 
 function Graph{T}() where T
@@ -94,6 +94,18 @@ function get_edge(g::Graph{T}, n1::Node{T}, n2::Node{T}) where T
   return edges(g)[i]
 end
 
+function get_edge_in_list(vec::Vector{AbstractEdge{T}}, n1::Node{T}, n2::Node{T}) where T
+  i = findfirst(x ->name.(ends(x)) == (name(n1), name(n2)) ,vec)
+  if isnothing(i)
+    i = findfirst(x -> name.(ends(x)) == (name(n2), name(n1)) , vec)
+    if isnothing(i) 
+      return nothing
+    end
+  end
+
+return vec[i]
+end
+
 
 """" Lis le fichier tsp et en extrait les données
     - Construit l'objet Graph 
@@ -143,8 +155,8 @@ function build_graph(filename::String)
   return g
 end
 
-function get_associated_edges(g::AbstractGraph, n::AbstractNode)
-  e_with_n = Vector{AbstractEdge}()
+function get_associated_edges(g::AbstractGraph{T}, n::AbstractNode{T}) where T
+  e_with_n = Vector{AbstractEdge{T}}()
   for e in edges(g)
     if name(ends(e)[1]) == name(n) || name(ends(e)[2]) == name(n)
       push!(e_with_n, e)
