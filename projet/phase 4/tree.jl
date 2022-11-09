@@ -3,6 +3,11 @@
 include("../phase 3/prim.jl")
 include("../phase 1/read_stsp.jl")
 function tree(g::Graph{T}, algorithm::Function) where T
+    # the function should be something like
+    # tree(g::Graph{T}, algorithm::Function, node_out::Node{T}) where T
+
+    # here, we should be able to retrieve the weights in the tree as well as the
+    # degree of every node
     return algorithm(g, nodes(g)[1])#, max_degree)
 end
 
