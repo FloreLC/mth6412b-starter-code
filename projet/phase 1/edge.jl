@@ -15,8 +15,8 @@ end
 ends(edge::AbstractEdge) = edge.ends
 
 
-weight(edge::AbstractEdge, w::Int) = edge.weight
-function set_weight!(edge::AbstractEdge)
+weight(edge::AbstractEdge) = edge.weight
+function set_weight!(edge::AbstractEdge, w::Int)
   edge.weight = w
   edge
 end

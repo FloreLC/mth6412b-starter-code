@@ -30,8 +30,8 @@ filename = ARGS[1]
 g = build_graph("../../instances/stsp/$(filename).tsp")
 tree_p = prim(g)
 println("Prim weight:",sum(weight.(edges(tree_p))))
-tree_k_baby = kruskal(g)
+tree_k_baby, c_k_baby = kruskal(g)
 println("Kruskal weight:",sum(weight.(edges(tree_p))))
-tree_k = tree(g, kruskal_1_tree)
+tree_k, c_k = tree(g, kruskal_1_tree)
 println("Kruskal 1 tree weight:",sum(weight.(edges(tree_k))))
 
