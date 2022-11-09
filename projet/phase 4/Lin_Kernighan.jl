@@ -1,11 +1,14 @@
 # include the required functions
 
+# here we have a function like
+# function LinKernighan(g::Graph{T}, algorithm::Function, starting_node::Node{T}, max_iterations::Int64, max_time::Int64, step::Float64) where T
+
 ################################
 ###### initial parameters ######
 ################################
 
 # this gets the number of nodes in the graph
-V = length(Nodes)
+V = length(Nodes) # nb_nodes(g)
 
 # set the starting PI vector
 PI = [0 for i in range(1, length = V)]
@@ -24,7 +27,7 @@ elapsed_time = 0
 # initialize the counter for the iterations
 iter = 0
 
-while iter <= max_iter && elapsed_time <= max_time #&& graph_degree != 2
+while iter <= max_iterations && elapsed_time <= max_time #&& graph_degree != 2
 
     # print out the progress so far
     println("-----------------------------------------------------------------------------------------------------------")
@@ -35,19 +38,23 @@ while iter <= max_iter && elapsed_time <= max_time #&& graph_degree != 2
     ################## STEP 2: Construct the 1-tree ##################
     ##################################################################
     # update the distance (this should be a function dual_distance!())
+    # one should create a copy of the graph to modify its weights such that
+    # after finishing the process one could get back the cost in the 'original scale'
+    # g_dual = g.copy()
+    
     for i in range(1, length = V)
         for j in range(1, length = V)
-            graph["distance_matrix"][i,j] = graph["distance_matrix"][i,j] - PI[i] - PI[j]
+            g_dual["distance_matrix"][i,j] = g_dual["distance_matrix"][i,j] - PI[i] - PI[j]
         end
     end
 
     # construct the 1-tree
-    OneTree = one_tree(graph, algorithm, node)
+    OneTree = tree(g, algorithm, starting_node)
     
     #################################################################
     ################## STEP 3: Update the cost ######################
     #################################################################
-    dual_cost = graph["total_cost"] - 2*sum(PI)
+    dual_cost = OneTree["total_cost"] - 2*sum(PI)
     
     #################################################################
     ############# STEP 4: Get the current incumbent #################
@@ -57,7 +64,7 @@ while iter <= max_iter && elapsed_time <= max_time #&& graph_degree != 2
     #################################################################
     ################ STEP 5: Get the graph degree ###################
     #################################################################
-    graph_degree = graph["degree"] .- 2
+    graph_degree = OneTree["degree"] .- 2
 
     #################################################################
     ################## STEP 6: Check for a tour #####################
@@ -73,7 +80,7 @@ while iter <= max_iter && elapsed_time <= max_time #&& graph_degree != 2
     ################ STEP 7: Update the step size ###################
     #################################################################
     # compute the norm
-    norm_degree = sqrt(sum(graph["degree"] .^ 2))
+    norm_degree = sqrt(sum(OneTree["degree"] .^ 2))
     # update the step size
     step = step * (incumbent - dual_cost) / norm_degree
 
