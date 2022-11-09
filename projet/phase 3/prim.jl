@@ -20,9 +20,10 @@ function get_all_edges_with_node(g::Graph{T}, node::Node{T}) where T
 end
 
 """
-Prend en parametre un vecteur des noeuds deja ajoutes a l'arbre de recouvrement et une arete
-Retourne l'extremité de l'arete qui n'appartient pas encore a l'arbre
-nothing sinon
+Prend en parametre la composante connexe correspondant a l'arbre de recouvrement et une arete
+Retourne un couple (enfant, parent) 
+Avec enfant l'extremité de l'arete qui n'appartient pas encore a l'arbre, parent l'extremite deja dans la composante
+(nothing, nothing) sinon
 """
 function node_to_add(tree_comp::Component{T}, new_edge::Edge{T}) where T
     (n1, n2) = ends(new_edge)
@@ -52,16 +53,17 @@ function prim(g::Graph{T}) where T
     current_node = nodes(g)[1]#[rand(1:nb_nodes(g))]
     #On garde en memoire les noeuds couverts par l'arbre
     add_to_comp!(tree_comp, current_node, current_node, d = 0)
-    #boolean qui indique quand il faut ajouter de nouvelles aretes aux aretes candidates
+    
     for e in get_all_edges_with_node(g, current_node)
         push!(edges_sorted, e)
     end
+    #boolean qui indique quand il faut mettre a jour les aretes candidates
     node_updated = false
 
-    #tant que tous les noeuds n<ont pas ete atteinds
+    #tant que tous les noeuds n'ont pas ete atteinds
     while length(keys(links(tree_comp))) < nb_nodes(g) 
         if node_updated
-            #On cherche toutes les aretes incidentes au noeud qu<on vient d'ajouter
+            #On cherche toutes les aretes incidentes au noeud qu'on vient d'ajouter
             for e in get_all_edges_with_node(g, current_node)
                 push!(edges_sorted, e)
             end
