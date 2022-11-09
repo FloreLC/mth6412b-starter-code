@@ -5,20 +5,29 @@ include("../phase 1/graph.jl")
 """Type abstrait de composantes connexes"""
 abstract type AbstractComp{T} end
 
-"""Type composante connexe: un dictionnaire ou chaque clef est un noeud, et chaque valeur son parent"""
+"""Type composante connexe: Deux dictionnaires pour representer un arbre
+    - links represente les arcs de l'arbre. Chaque clef est un noeud, et chaque valeur son parent.
+    - degrees represente les degres de chaque sommet. (K => V) = noeud => degre 
+"""
 mutable struct Component{T} <: AbstractComp{T}
-    # this adds the degree of the node that is going to be used as a constraint to construct the 1-tree
-    # this might take the value 0, 1 or 2 in a 1-tree scheme
     links::Dict{Node{T}, Node{T}}
     degrees::Dict{Node{T}, Int}
 end
 
-# it gets the node within the component
+"""
+Getter for the links dictionnary of a component c
+"""
 links(c::AbstractComp) = c.links
+
+"""
+Getter for the degrees dictionnary of a component c
+"""
 degrees(c::AbstractComp) = c.degrees
 
 
-
+"""
+Constructor for an elementary Component
+"""
 function Component{T}() where T
     links = Dict{Node{T}, Node{T}}()
     degrees = Dict{Node{T}, Int}()
@@ -27,7 +36,7 @@ end
 
 
 """
-Vide une composante connexe de ces noeuds
+Vide une composante connexe de tous ses noeuds
 """
 function empty!(comp::AbstractComp{T}) where T
     delete!(links(comp), keys(links(comp)))
@@ -52,7 +61,7 @@ function set_degree!(c::AbstractComp{T}, n::Node{T}, new_degree::Int64) where T
 end
 
 """
-Incremente de 1 le degre d'un noeud dans un arbre en construction. Si le noeud n'appartient pas a la composante, ajoute le noeud avec un degre 1
+Incremente de 1 le degre d'un noeud dans un arbre en construction. Si le noeud n'appartient pas a la composante, ne fait rien 
 """
 function increase_degree!(c::AbstractComp{T}, n::Node{T}) where T
     if haskey(degrees(c), n)
@@ -68,17 +77,20 @@ function isequal(c1::AbstractComp, c2::AbstractComp)
     return isequal(links(c1), links(c2)) && isequal(degrees(c1), degrees(c2))
 end
 
-
+"""
+Ajoute une relation parent-enfant a une composante connexe, ie., mets a jour les degres 
+"""
 function add_to_comp!(c::AbstractComp{T}, child::Node{T}, parent::Node{T}; d = 1) where T
     links(c)[child] = parent
-    degrees(c)[child] = d
-    increase_degree!(c, parent)
+    if !haskey(degrees(c), child)
+        degrees(c)[child] = d
+        increase_degree!(c, parent)
+    end
     c
-
 end
 
 """
-Prend en argument un graphe et renvoi un vecteur de composantes connexes initiales (noeud n => noeud n)
+Prend en argument un graphe et renvoi un vecteur de composantes connexes initiales (noeud n => noeud n, noeud n => 0)
 """
 function to_components(g::Graph{T}) where T
     tmp = Vector{Component{T}}()
@@ -106,12 +118,18 @@ function get_component_with_node(tree::Vector{Component{T}}, n::Node{T}) where T
     return nothing
 end
 
+"""
+Supprime un noeud d'une composante connexe
+"""
 function remove_from_comp!(c::AbstractComp{T}, n::Node{T}) where T
     delete!(links(c), n)
     delete!(degrees(c), n)
     c
 end
 
+"""
+Merge deux composantes connexes
+"""
 function merge_comp!(comp1::AbstractComp, comp2::AbstractComp)
     comp1.links = Dict(links(comp1)..., links(comp2)...)
     comp1.degrees = Dict(degrees(comp1)..., degrees(comp2)...)
