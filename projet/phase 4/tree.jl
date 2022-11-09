@@ -2,13 +2,13 @@
 #include("./connex_componant.jl")
 include("../phase 3/prim.jl")
 include("../phase 1/read_stsp.jl")
-function tree(g::Graph{T}, algorithm::Function) where T
-    # the function should be something like
+function one_tree(g::Graph{T}, algorithm::Function, node_out::Node{T}) where T
+    # the function should be something like 
     # tree(g::Graph{T}, algorithm::Function, node_out::Node{T}) where T
 
     # here, we should be able to retrieve the weights in the tree as well as the
     # degree of every node
-    return algorithm(g, nodes(g)[1])#, max_degree)
+    return algorithm(g, node_out)
 end
 
 # g = Graph{Char}()
@@ -37,6 +37,7 @@ tree_p = prim(g)
 println("Prim weight:",sum(weight.(edges(tree_p))))
 tree_k_baby, c_k_baby = kruskal(g)
 println("Kruskal weight:",sum(weight.(edges(tree_p))))
-tree_k, c_k = tree(g, kruskal_1_tree)
+tree_k, c_k = one_tree(g, kruskal_1_tree, nodes(g)[1])
+@show degrees(c_k)
 println("Kruskal 1 tree weight:",sum(weight.(edges(tree_k))))
 
