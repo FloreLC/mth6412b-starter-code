@@ -17,6 +17,15 @@ end
 links(c::AbstractComp) = c.links
 degrees(c::AbstractComp) = c.degrees
 
+
+
+function Component{T}() where T
+    links = Dict{Node{T}, Node{T}}()
+    degrees = Dict{Node{T}, Int}()
+    return Component{T}(links, degrees)
+end
+
+
 """
 Vide une composante connexe de ces noeuds
 """
@@ -57,6 +66,15 @@ Compare deux composantes connexes
 """
 function isequal(c1::AbstractComp, c2::AbstractComp)
     return isequal(links(c1), links(c2)) && isequal(degrees(c1), degrees(c2))
+end
+
+
+function add_to_comp!(c::AbstractComp{T}, child::Node{T}, parent::Node{T}; d = 1) where T
+    links(c)[child] = parent
+    degrees(c)[child] = d
+    increase_degree!(c, parent)
+    c
+
 end
 
 """
@@ -156,34 +174,3 @@ function kruskal(g::Graph{T}) where T
     return Graph{T}("Kruskal de $(name(g))", nodes(g), edges_selected), tree_comps[1]
 end
 
-"""
-Prend en parametre un graphe et renvoi un arbre couvrant de poids minimum en utilisant l'algorithme de Kruskal
-"""
-function kruskal_1_tree(g::Graph{T}, root::Node{T}) where T
-
-    to_remove =  get_associated_edges(g, root)
-    #### Remove the root
-    deleteat!(nodes(g), findall(x->name(x)==name(root),nodes(g)))
-    filter!(x -> isnothing(findfirst(y -> isequal(x,y), to_remove)), edges(g))
-
-    tree , c = kruskal(g)
-    leaves = filter(kv -> kv.second ==1, degrees(c))
-    #get edges in to_remove between root & leaf
-    edges_candidates = Vector{Edge{T}}()
-    for l in  collect(keys(leaves))
-        new = get_edge_in_list(to_remove, root, l)
-        if !isnothing(new)
-            push!(edges_candidates, new)
-        end
-    end
-    edge_sorted = sort(edges_candidates, by=weight)
-    #add the root and 2 cheapest arcs from the root to a leaf
-    add_node!(tree, root)
-    for i in 1:2
-        e = pop!(edge_sorted)
-        add_edge!(tree, e)
-        increase_degree!(c, ends(e)[1]) 
-        increase_degree!(c, ends(e)[2]) 
-    end
-    return tree, c
-end

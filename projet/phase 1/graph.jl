@@ -94,7 +94,7 @@ function get_edge(g::Graph{T}, n1::Node{T}, n2::Node{T}) where T
   return edges(g)[i]
 end
 
-function get_edge_in_list(vec::Vector{AbstractEdge{T}}, n1::Node{T}, n2::Node{T}) where T
+function get_edge_in_list(vec::Vector{Edge{T}}, n1::Node{T}, n2::Node{T}) where T
   i = findfirst(x ->name.(ends(x)) == (name(n1), name(n2)) ,vec)
   if isnothing(i)
     i = findfirst(x -> name.(ends(x)) == (name(n2), name(n1)) , vec)

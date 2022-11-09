@@ -2,13 +2,36 @@
 #include("./connex_componant.jl")
 include("../phase 3/prim.jl")
 include("../phase 1/read_stsp.jl")
-function one_tree(g::Graph{T}, algorithm::Function, node_out::Node{T}) where T
-    # the function should be something like 
-    # tree(g::Graph{T}, algorithm::Function, node_out::Node{T}) where T
+function one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
+ 
+    to_remove = get_all_edges_with_node(g, root)
 
-    # here, we should be able to retrieve the weights in the tree as well as the
-    # degree of every node
-    return algorithm(g, node_out)
+    nodes_copy = nodes(g)[findall(x->name(x)!=name(root),nodes(g))]
+    #deleteat!(nodes(g), findall(x->name(x)==name(root),nodes(g)))
+    # filter!(x -> !(x in to_remove), edges(g))
+    edges_copy = filter(x -> !(x in to_remove), edges(g))
+
+    tree , c = algorithm(Graph{T}("", nodes_copy, edges_copy))
+    show.(edges(tree))
+    leaves = filter(kv -> kv.second ==1, degrees(c))
+    #get edges in to_remove between root & leaf
+    edges_candidates = Vector{Edge{T}}()
+    for l in  collect(keys(leaves))
+        new = get_edge_in_list(to_remove, root, l)
+        if !isnothing(new)
+            push!(edges_candidates, new)
+        end
+    end
+    edge_sorted = sort(edges_candidates, by=weight)
+    #add the root and 2 cheapest arcs from the root to a leaf
+    add_node!(tree, root)
+    for i in 1:2
+        e = pop!(edge_sorted)
+        add_edge!(tree, e)
+        increase_degree!(c, ends(e)[1]) 
+        increase_degree!(c, ends(e)[2]) 
+    end
+    return tree, c
 end
 
 # g = Graph{Char}()
@@ -33,11 +56,13 @@ end
 
 filename = ARGS[1]
 g = build_graph("../../instances/stsp/$(filename).tsp")
-tree_p = prim(g)
-println("Prim weight:",sum(weight.(edges(tree_p))))
-tree_k_baby, c_k_baby = kruskal(g)
-println("Kruskal weight:",sum(weight.(edges(tree_p))))
-tree_k, c_k = one_tree(g, kruskal_1_tree, nodes(g)[1])
-@show degrees(c_k)
-println("Kruskal 1 tree weight:",sum(weight.(edges(tree_k))))
 
+tree_prim, c_prim = prim(g)
+println("Prim weight:",sum(weight.(edges(tree_prim))))
+tree_k_baby, c_k_baby = kruskal(g)
+println("Kruskal weight:",sum(weight.(edges(tree_k_baby))))
+#tree_k, c_k = one_tree(g, kruskal, nodes(g)[1])
+#println("Kruskal 1 tree weight:",sum(weight.(edges(tree_k))))
+tree_p, c_p = one_tree(g, prim, nodes(g)[1])
+println("Prim 1 tree weight:",sum(weight.(edges(tree_p))))
+show.(edges(tree_p))
