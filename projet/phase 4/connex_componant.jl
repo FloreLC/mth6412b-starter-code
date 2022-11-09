@@ -56,7 +56,7 @@ Incremente de 1 le degre d'un noeud dans un arbre en construction. Si le noeud n
 """
 function increase_degree!(c::AbstractComp{T}, n::Node{T}) where T
     if haskey(degrees(c), n)
-        degrees(c)[n] = degrees(c)[n] +1
+        degrees(c)[n] = degrees(c)[n] + 1
     end
     c
 end
