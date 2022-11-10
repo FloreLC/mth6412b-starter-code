@@ -64,7 +64,22 @@ while iter <= max_iterations && elapsed_time <= max_time #&& graph_degree != 2
     #################################################################
     ################ STEP 5: Get the graph degree ###################
     #################################################################
-    graph_degree = OneTree["degree"] .- 2
+    # if the way is said not to be adaptive then
+    # both graph_degree are the same to save lines below
+    # otherwise, save the previous graph_degree and then 
+    # update it
+    if !adaptive
+        graph_degree = OneTree["degree"] .- 2
+        graph_degree_prev = graph_degree.copy()
+    else
+        if k == 0
+            graph_degree = OneTree["degree"] .- 2
+            graph_degree_prev = graph_degree.copy()
+        else
+            graph_degree_prev = graph_degree.copy()
+            graph_degree = OneTree["degree"] .- 2
+        end
+    end
 
     #################################################################
     ################## STEP 6: Check for a tour #####################
@@ -87,8 +102,9 @@ while iter <= max_iterations && elapsed_time <= max_time #&& graph_degree != 2
     #################################################################
     ################ STEP 8: Update reduced costs ###################
     #################################################################
+    # if adaptive here we save lines of code
     for k in range(1, V)
-        PI[k] = PI[k] + step*graph_degree[k]
+        PI[k] = PI[k] + step*(0.7*graph_degree[k] + 0.3*graph_degree_prev[k])
     end
 
     #################################################################
