@@ -100,7 +100,7 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
         
                 # LUIS: I think we are not actually replacing the edge
                 # replace the weight of the edge in g whose ends are n1 and n2
-                set_weight!(edge, weight(get_edges(g, n1, n2)))
+                set_weight!(edge, weight(get_edge(g, n1, n2)))
             end
             # update the 1-tree cost
             TreeCost = sum(weight.(edges(OneTree)))
@@ -148,7 +148,7 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
 
         # LUIS: I think we are not actually replacing the edge
         # replace the weight of the edge in g whose ends are n1 and n2
-        set_weight!(edge, weight(get_edges(g, n1, n2)))
+        set_weight!(edge, weight(get_edge(g, n1, n2)))
     end
     # update the 1-tree cost
     TreeCost = sum(weight.(edges(OneTree)))
