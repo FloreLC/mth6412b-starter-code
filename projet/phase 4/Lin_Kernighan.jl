@@ -1,4 +1,7 @@
 # include the required functions
+# include("../phase 1/node.jl")
+# include("../phase 1/edge.jl")
+# include("../phase 1/graph.jl")
 include("tree.jl")
 
 # here we have a function like
@@ -12,7 +15,7 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
     V = nb_nodes(g)
 
     # set the starting PI vector
-    PI = [0 for i in range(1, length = V)]
+    PI = Int[0 for i in range(1, length = V)]
     ################################
 
     #####################################
@@ -22,11 +25,11 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
     # tracks the improvement over the cost function
     incumbent = -Inf # starting lower bound
 
-    # clocks the time
-    elapsed_time = 0
-
     # initialize the counter for the iterations
     iter = 1
+
+    # clocks the time
+    elapsed_time = 0
 
     while iter <= max_iterations && elapsed_time <= max_time
 
@@ -50,7 +53,8 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
         
             # LUIS: I think we are not actually replacing the edge
             # replace the weight
-            set_weight!(edge, edge.weight - PI[data(n1)] - PI[data(n2)])
+            #set_weight!(edge, edge.weight - PI[data(n1)] - PI[data(n2)])
+            weight(get_edge(g_dual, n1, n2)) = weight(edge) - PI[data(n1)] - PI[data(n2)]
         end
 
         # construct the 1-tree
@@ -100,7 +104,8 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
         
                 # LUIS: I think we are not actually replacing the edge
                 # replace the weight of the edge in g whose ends are n1 and n2
-                set_weight!(edge, weight(get_edge(g, n1, n2)))
+                #set_weight!(edge, weight(get_edge(g, n1, n2)))
+                weight(get_edge(OneTree, n1, n2)) = weight(get_edge(g, n1, n2))
             end
             # update the 1-tree cost
             TreeCost = sum(weight.(edges(OneTree)))
@@ -108,7 +113,13 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
             println("----- A Hamiltonian tour has been found -----")
             println("---- The tour found has cost $(TreeCost) ----")
             println("---------------------------------------------")
-            return OneTree
+            # indicator to check whether the solution is a tour
+            Tour = false
+
+            # updates the time
+            elapsed_time = (time_ns() - elapsed_time)/1.0e9
+
+            return OneTree, TreeCost, Tour, elapsed_time
             break
         end
 
@@ -126,6 +137,7 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
         # if not adaptive graph_degree and graph_degree_prev are equal
         for k in range(1, V)
             PI[k] = PI[k] + step*(0.7*graph_degree[k] + 0.3*graph_degree_prev[k])
+            PI[k] = Int(round(PI[k])) # this will no longer be necessary if changing the structure of the edge
         end
 
         #################################################################
@@ -141,6 +153,9 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
     println("---------------------------------------------")
     println("--- A Hamiltonian tour could not be found ---")
     println("---------------------------------------------")
+    # indicator to check whether the solution is a tour
+    Tour = false
+
     # here we should get the original weights in the tree
     for edge in edges(Onetree)
         # get the ends of the edge
@@ -148,10 +163,15 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
 
         # LUIS: I think we are not actually replacing the edge
         # replace the weight of the edge in g whose ends are n1 and n2
-        set_weight!(edge, weight(get_edge(g, n1, n2)))
+        # set_weight!(edge, weight(get_edge(g, n1, n2)))
+        weight(get_edge(OneTree, n1, n2)) = weight(get_edge(g, n1, n2))
     end
     # update the 1-tree cost
     TreeCost = sum(weight.(edges(OneTree)))
-    return OneTree
+
+    # updates the time
+    elapsed_time = (time_ns() - elapsed_time)/1.0e9
+
+    return OneTree, TreeCost, Tour, elapsed_time
 
 end

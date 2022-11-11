@@ -82,7 +82,7 @@ end
 # println("Prim 1 tree weight:",sum(weight.(edges(tree_p))))
 # show.(edges(tree_p))
 
-for n in nodes(graph)
-    degree(c_p, n) # ordered
-end
-values(c_p)
+# for n in nodes(graph)
+#     degree(c_p, n) # ordered
+# end
+# values(c_p)
