@@ -69,15 +69,20 @@ end
 #     add_edge!(g, Edge((get_node(g, "d"), get_node(g, "e")), 9))
 #     add_edge!(g, Edge((get_node(g, "f"), get_node(g, "e")), 10))
 
-filename = ARGS[1]
-g = build_graph("../../instances/stsp/$(filename).tsp")
+# filename = ARGS[1]
+# g = build_graph("../../instances/stsp/$(filename).tsp")
 
-tree_prim, c_prim = prim(g)
-println("Prim weight:",sum(weight.(edges(tree_prim))))
-tree_k_baby, c_k_baby = kruskal(g)
-println("Kruskal weight:",sum(weight.(edges(tree_k_baby))))
-#tree_k, c_k = one_tree(g, kruskal, nodes(g)[1])
-#println("Kruskal 1 tree weight:",sum(weight.(edges(tree_k))))
-tree_p, c_p = one_tree(g, prim, nodes(g)[1])
-println("Prim 1 tree weight:",sum(weight.(edges(tree_p))))
-show.(edges(tree_p))
+# tree_prim, c_prim = prim(g)
+# println("Prim weight:",sum(weight.(edges(tree_prim))))
+# tree_k_baby, c_k_baby = kruskal(g)
+# println("Kruskal weight:",sum(weight.(edges(tree_k_baby))))
+# #tree_k, c_k = one_tree(g, kruskal, nodes(g)[1])
+# #println("Kruskal 1 tree weight:",sum(weight.(edges(tree_k))))
+# tree_p, c_p = one_tree(g, prim, nodes(g)[1])
+# println("Prim 1 tree weight:",sum(weight.(edges(tree_p))))
+# show.(edges(tree_p))
+
+for n in nodes(graph)
+    degree(c_p, n) # ordered
+end
+values(c_p)

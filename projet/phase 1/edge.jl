@@ -11,9 +11,7 @@ mutable struct Edge{T} <: AbstractEdge{T}
   weight::Int
 end
 
-
 ends(edge::AbstractEdge) = edge.ends
-
 
 weight(edge::AbstractEdge) = edge.weight
 function set_weight!(edge::AbstractEdge, w::Int)
