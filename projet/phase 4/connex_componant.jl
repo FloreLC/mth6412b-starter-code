@@ -182,6 +182,7 @@ function kruskal(g::Graph{T}) where T
 
         if !isequal(comp1, comp2)
             push!(edges_selected, e)
+          
             add_nodes_at!(comp1, comp2, e)
             ## add all elements of comp2 to comp1 except the node we attached already in the previous line
 

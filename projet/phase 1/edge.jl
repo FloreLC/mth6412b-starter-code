@@ -8,14 +8,14 @@ abstract type AbstractEdge{T} end
 """
 mutable struct Edge{T} <: AbstractEdge{T}
   ends::Tuple{Node{T}, Node{T}}
-  weight::Int
+  weight::Float64
 end
 
 ends(edge::AbstractEdge) = edge.ends
 
 weight(edge::AbstractEdge) = edge.weight
 
-function set_weight!(edge::AbstractEdge, w::Int)
+function set_weight!(edge::AbstractEdge, w::Float64)
   edge.weight = w
   edge
 end

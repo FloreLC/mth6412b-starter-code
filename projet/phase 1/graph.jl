@@ -1,5 +1,7 @@
 import Base.show
+import Base.copy
 include("./edge.jl")
+
 """Type abstrait dont d'autres types de graphes dériveront."""
 abstract type AbstractGraph{T} end
 
@@ -121,9 +123,11 @@ Pour lancer le programme:
         julia main.jl gr17.tsp
 """
 function build_graph(filename::String)
-  #graph_nodes, graph_edges, edges_brut, weights = read_stsp("filename")
+  # graph_nodes, graph_edges, edges_brut, weights = read_stsp("filename")
+
   graph_nodes, graph_edges, edges_brut, weights = read_stsp("../../instances/stsp/$(filename)")
-  header = read_header(filename)
+  header = read_header("../../instances/stsp/$(filename)")
+ 
   graph_name = split( last(split(filename, "/")), ".")[1]
   ### Construire les nodes
   if header["DISPLAY_DATA_TYPE"] == "TWOD_DISPLAY" || header["DISPLAY_DATA_TYPE"] == "COORD_DISPLAY"
@@ -138,7 +142,6 @@ function build_graph(filename::String)
       end
   end
 
-
   ### Construire les edges 
   g_nodes = nodes(g)
   for i in eachindex(edges_brut)
@@ -152,7 +155,9 @@ function build_graph(filename::String)
           edge = Edge{typeof(data(u))}((u,v),weights[i])
           add_edge!(g, edge)
       end
+
   end
+  
   return g
 end
 
@@ -164,4 +169,11 @@ function get_associated_edges(g::AbstractGraph{T}, n::AbstractNode{T}) where T
     end
   end
   return e_with_n
+end
+
+function copy(g::Graph{T}) where T
+  new_edges = deepcopy(edges(g))
+  new_nodes = deepcopy(nodes(g))
+  new_name = "$(name(g))-copie"
+  return Graph{T}(new_name, new_nodes, new_edges)
 end
