@@ -19,7 +19,12 @@ function one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
     tree , c = algorithm(Graph{T}("", nodes_copy, edges_copy))
 
     # Gets all the nodes with degree 1 in the MST tree
-    leaves = filter(kv -> kv.second ==1, degrees(c))
+
+    #### the degree should not be filtered to 1 degree nodes but anyone since
+    #### we need a cycle
+
+    #leaves = filter(kv -> kv.second ==1, degrees(c))
+    leaves = filter(kv -> kv.second >= 0, degrees(c))
     edges_candidates = Vector{Edge{T}}()
 
     # Gather all the edges between root and the MST leaves

@@ -1,6 +1,6 @@
 import Base.show
 import Base.copy
-include("./edge.jl")
+include("edge.jl")
 
 """Type abstrait dont d'autres types de graphes dériveront."""
 abstract type AbstractGraph{T} end
@@ -125,8 +125,8 @@ Pour lancer le programme:
 function build_graph(filename::String)
   # graph_nodes, graph_edges, edges_brut, weights = read_stsp("filename")
 
-  graph_nodes, graph_edges, edges_brut, weights = read_stsp("../../instances/stsp/$(filename)")
-  header = read_header("../../instances/stsp/$(filename)")
+  graph_nodes, graph_edges, edges_brut, weights = read_stsp("instances/stsp/$(filename)")
+  header = read_header("instances/stsp/$(filename)")
  
   graph_name = split( last(split(filename, "/")), ".")[1]
   ### Construire les nodes

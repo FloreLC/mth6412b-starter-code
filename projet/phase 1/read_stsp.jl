@@ -1,5 +1,5 @@
 using Plots
-include("./graph.jl")
+include("graph.jl")
 """Analyse un fichier .tsp et renvoie un dictionnaire avec les données de l'entête."""
 function read_header(filename::String)
 
@@ -244,6 +244,6 @@ end
 
 """Fonction de commodité qui lit un fichier stsp et trace le graphe."""
 function plot_graph(filename::String)
-  graph_nodes, graph_edges = read_stsp(filename)
+  graph_nodes, graph_edges = read_stsp("instances/stsp/$(filename)")
   plot_graph(graph_nodes, graph_edges)
 end

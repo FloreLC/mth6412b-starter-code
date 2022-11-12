@@ -1,5 +1,5 @@
 import Base.show
-include("./node.jl")
+include("node.jl")
 
 """Type abstrait dont d'autres types d'aretes dériveront."""
 abstract type AbstractEdge{T} end
