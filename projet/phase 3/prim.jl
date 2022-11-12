@@ -52,12 +52,12 @@ function prim(g::Graph{T}) where T
     #on choisi au hasard une racine
     current_node = nodes(g)[1]#[rand(1:nb_nodes(g))]
     #On garde en memoire les noeuds couverts par l'arbre
-    add_to_comp!(tree_comp, current_node, current_node, d = 0)
     
+    add_to_comp!(tree_comp, current_node, current_node, 0)
     for e in get_all_edges_with_node(g, current_node)
         push!(edges_sorted, e)
     end
-    #boolean qui indique quand il faut mettre a jour les aretes candidates
+    #boolean qui indique quand il faut mettre a jour les aretes candixsdates
     node_updated = false
 
     #tant que tous les noeuds n'ont pas ete atteinds
@@ -76,13 +76,15 @@ function prim(g::Graph{T}) where T
         #On identifi quel noeud est ajouté avec l'ajout de cet arete
         child, parent = node_to_add(tree_comp, new_edge)
         if !(isnothing(child))
+            
             #On ajoute l'arete a l'arbre
-            add_to_comp!(tree_comp, child, parent)
+            add_to_comp!(tree_comp, child, parent, 1)
             push!(edges_selected, new_edge)
             #On ajoute le nouveau noeud a notre liste
             current_node = child
             node_updated = true
         end   
+       
     end
 
     return Graph("Prim arbre couvrant min de $(name(g))", nodes(g), edges_selected), tree_comp

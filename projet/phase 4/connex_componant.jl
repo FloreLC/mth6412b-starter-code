@@ -80,11 +80,13 @@ end
 """
 Ajoute une relation parent-enfant a une composante connexe, ie., mets a jour les degres 
 """
-function add_to_comp!(c::AbstractComp{T}, child::Node{T}, parent::Node{T}; d = 1) where T
+function add_to_comp!(c::AbstractComp{T}, child::Node{T}, parent::Node{T}, deg::Int) where T
     links(c)[child] = parent
     if !haskey(degrees(c), child)
-        degrees(c)[child] = d
-        increase_degree!(c, parent)
+        degrees(c)[child] = deg
+        if deg > 0
+            increase_degree!(c, parent)
+        end
     end
     c
 end
