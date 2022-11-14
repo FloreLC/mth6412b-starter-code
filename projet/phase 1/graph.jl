@@ -59,6 +59,31 @@ edges(graph::AbstractGraph) = graph.edges
 """Renvoie le nombre des edges du graphe."""
 nb_edges(graph::AbstractGraph) = length(graph.edges)
 
+function test_graph()
+
+  g = Graph{Char}()
+  for i in 1:9
+    n = Node(string('a' + i-1), 'a' + i-1)
+    add_node!(g, n)
+  end
+  add_edge!(g, Edge((get_node(g, "a"), get_node(g, "b")), 4.0))
+  add_edge!(g, Edge( (get_node(g, "a"), get_node(g, "h")), 8.0))
+  add_edge!(g, Edge((get_node(g, "b"), get_node(g, "h")), 11.0))
+  add_edge!(g, Edge((get_node(g, "b"), get_node(g, "c")), 8.0))
+  add_edge!(g, Edge((get_node(g, "h"), get_node(g, "i")), 7.0))
+  add_edge!(g, Edge((get_node(g, "g"), get_node(g, "h")), 1.0))
+  add_edge!(g, Edge((get_node(g, "i"), get_node(g, "g")), 6.0))
+  add_edge!(g, Edge((get_node(g, "i"), get_node(g, "c")), 2.0))
+  add_edge!(g, Edge((get_node(g, "g"), get_node(g, "f")), 2.0))
+  add_edge!(g, Edge((get_node(g, "c"), get_node(g, "f")), 4.0))
+  add_edge!(g, Edge((get_node(g, "c"), get_node(g, "d")), 7.0))
+  add_edge!(g, Edge((get_node(g, "d"), get_node(g, "f")), 14.0))
+  add_edge!(g, Edge((get_node(g, "d"), get_node(g, "e")), 9.0))
+  add_edge!(g, Edge((get_node(g, "f"), get_node(g, "e")), 10.0))
+  return g
+end
+
+
 """Retourn l'indice dans le vecteur des noeuds du graphe graph du noeud s. Nothing si le noeud ne fait pas parti du graphe."""
 function get_node(graph::Graph, s::String) 
   i = findfirst(x -> ( name(x) == s), nodes(graph))  

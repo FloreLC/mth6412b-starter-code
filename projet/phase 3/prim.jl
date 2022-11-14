@@ -44,6 +44,8 @@ Prend en parametre un grapheet renvoi un graphe qui est un de ses arbres de reco
 """
 function prim(g::Graph{T}) where T
     tree_comp = Component{T}()
+   
+    
     edges_selected = Vector{Edge{T}}()
 
     #Toutes les aretes sont dans une queue de priorite. Le poids de l'arete sert d'indice de priorité. Plus l'arete est legere, plus elle est prioritaire
@@ -86,6 +88,6 @@ function prim(g::Graph{T}) where T
         end   
        
     end
-
+    
     return Graph("Prim arbre couvrant min de $(name(g))", nodes(g), edges_selected), tree_comp
 end

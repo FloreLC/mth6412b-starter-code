@@ -19,12 +19,12 @@ plot the results afterwards.
 # this section will test the instances to check the running times with other instances
 # instances = [item for item in walkdir("../../instances/stsp")][1][3]
 # @show instances
-instances = ["swiss42.tsp"]
+instances = ["gr17.tsp"]
 
 # create the grid for experimentation
 algorithms = [prim]
 # step = [10*i for i in 1:10]
-step = [100]
+step = [1]
 grid = DataFrame(collect(Iterators.product(algorithms, step, [true, false])))
 
 
@@ -36,8 +36,8 @@ for instance in instances
     println("---- Solving instance $(instance) ----")
     for j in range(1, size(grid)[1])
         
-        graph = build_graph(instance)
-       
+        #graph = build_graph(instance)
+       graph = test_graph()
         # apply the algorithm to found the tour
         Solution, Cost, Tour, Time = LinKernighan(graph, grid[j, 1], nodes(graph)[1], 1000, 60, grid[j, 2] * 1.0, grid[j, 3])
 

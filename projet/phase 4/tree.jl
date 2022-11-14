@@ -25,18 +25,13 @@ function one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
     #leaves = filter(kv -> kv.second ==1, degrees(c))
     leaves = filter(kv -> kv.second >= 0, degrees(c))
 
-    edges_candidates = Vector{Edge{T}}()
+    #edges_candidates = Vector{Edge{T}}()
 
     # Gather all the edges between root and the MST leaves
-    for l in  collect(keys(leaves))
-        new = get_edge_in_list(to_remove, root, l)
-        if !isnothing(new)
-            push!(edges_candidates, new)
-        end
-    end
+   
 
     # Order this edges by weight
-    edge_sorted = sort(edges_candidates, by=weight)
+    edge_sorted = sort(to_remove, by=weight)
 
     # Add the root and 2 cheapest arcs from the root to a leaf
     # Keep the component c updated
