@@ -68,7 +68,7 @@ Tour = false
 # set the seed for the random number generator
 # srand(12345)
 
-while iter <= 10 #&& elapsed_time <= 60000000
+while iter <= 100 #&& elapsed_time <= 60000000
 
     println("-----------------------------------------------------------------------------------------------------------")
     println("--- Iteration: $(iter) | Elapsed time (s): $(round(elapsed_time; digits = 4)) | Incumbent: $(incumbent) ---")
@@ -89,10 +89,10 @@ while iter <= 10 #&& elapsed_time <= 60000000
     end
 
     # construct the 1-tree and the degree of the nodes
-    global OneTree, tree_degree = one_tree(graph, prim, nodes(graph)[1])
+    global OneTree, tree_degree = one_tree(graph, prim, nodes(graph)[3])
     
-    # erase this break afterwards, just for debugging
-    break
+    # # erase this break afterwards, just for debugging
+    # break
 
     # compute the total cost of the 1-tree
     global TreeCost = sum(weight.(edges(OneTree)))
@@ -154,6 +154,26 @@ if !Tour
     println("-------------------------------------------------")
     println("----- A Hamiltonian tour has not been found -----")
 end
+
+@show OneTree
+@show tree_degree
+
+@show edges(OneTree)
+
+# tree_p, c_p = one_tree(g, prim, nodes(g)[1])
+# edges(tree_p)
+# c_p
+
+# # test of the constructed 1-tree
+# @testset "1-tree results" begin
+#     @test length(edges(tree_p)) == nb_nodes(graph)
+#     @test sum(weight.(edges(tree_p))) == 45
+# end
+
+# # LUIS: how to do this for testing?
+# for n in nodes(graph)
+#     degree(tree_degree, n)
+# end
 
 # # here we have a function like
 # function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_iterations::Int64, max_time::Int64, step::Float64, adaptive::Bool) where T
@@ -362,3 +382,4 @@ end
 #     return OneTree, TreeCost, Tour, elapsed_time
 
 # end
+

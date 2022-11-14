@@ -23,7 +23,7 @@ function one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
     #### we need a cycle
 
     #leaves = filter(kv -> kv.second ==1, degrees(c))
-    leaves = filter(kv -> kv.second == 1, degrees(c))
+    leaves = filter(kv -> kv.second >= 0, degrees(c))
 
     edges_candidates = Vector{Edge{T}}()
 
@@ -56,25 +56,25 @@ function one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
     return tree, c
 end
 
-g = Graph{Char}()
-    for i in 1:9
-        n = Node(string('a' + i-1), 'a' + i-1)
-        add_node!(g, n)
-    end
-    add_edge!(g, Edge((get_node(g, "a"), get_node(g, "b")), 4.0))
-    add_edge!(g, Edge( (get_node(g, "a"), get_node(g, "h")), 8.0))
-    add_edge!(g, Edge((get_node(g, "b"), get_node(g, "h")), 11.0))
-    add_edge!(g, Edge((get_node(g, "b"), get_node(g, "c")), 8.0))
-    add_edge!(g, Edge((get_node(g, "h"), get_node(g, "i")), 7.0))
-    add_edge!(g, Edge((get_node(g, "g"), get_node(g, "h")), 1.0))
-    add_edge!(g, Edge((get_node(g, "i"), get_node(g, "g")), 6.0))
-    add_edge!(g, Edge((get_node(g, "i"), get_node(g, "c")), 2.0))
-    add_edge!(g, Edge((get_node(g, "g"), get_node(g, "f")), 2.0))
-    add_edge!(g, Edge((get_node(g, "c"), get_node(g, "f")), 4.0))
-    add_edge!(g, Edge((get_node(g, "c"), get_node(g, "d")), 7.0))
-    add_edge!(g, Edge((get_node(g, "d"), get_node(g, "f")), 14.0))
-    add_edge!(g, Edge((get_node(g, "d"), get_node(g, "e")), 9.0))
-    add_edge!(g, Edge((get_node(g, "f"), get_node(g, "e")), 10.0))
+# g = Graph{Char}()
+#     for i in 1:9
+#         n = Node(string('a' + i-1), 'a' + i-1)
+#         add_node!(g, n)
+#     end
+#     add_edge!(g, Edge((get_node(g, "a"), get_node(g, "b")), 4.0))
+#     add_edge!(g, Edge( (get_node(g, "a"), get_node(g, "h")), 8.0))
+#     add_edge!(g, Edge((get_node(g, "b"), get_node(g, "h")), 11.0))
+#     add_edge!(g, Edge((get_node(g, "b"), get_node(g, "c")), 8.0))
+#     add_edge!(g, Edge((get_node(g, "h"), get_node(g, "i")), 7.0))
+#     add_edge!(g, Edge((get_node(g, "g"), get_node(g, "h")), 1.0))
+#     add_edge!(g, Edge((get_node(g, "i"), get_node(g, "g")), 6.0))
+#     add_edge!(g, Edge((get_node(g, "i"), get_node(g, "c")), 2.0))
+#     add_edge!(g, Edge((get_node(g, "g"), get_node(g, "f")), 2.0))
+#     add_edge!(g, Edge((get_node(g, "c"), get_node(g, "f")), 4.0))
+#     add_edge!(g, Edge((get_node(g, "c"), get_node(g, "d")), 7.0))
+#     add_edge!(g, Edge((get_node(g, "d"), get_node(g, "f")), 14.0))
+#     add_edge!(g, Edge((get_node(g, "d"), get_node(g, "e")), 9.0))
+#     add_edge!(g, Edge((get_node(g, "f"), get_node(g, "e")), 10.0))
 
 # filename = ARGS[1]
 # g = build_graph("../../instances/stsp/$(filename).tsp")
@@ -85,7 +85,7 @@ g = Graph{Char}()
 # println("Kruskal weight:",sum(weight.(edges(tree_k_baby))))
 # #tree_k, c_k = one_tree(g, kruskal, nodes(g)[1])
 # #println("Kruskal 1 tree weight:",sum(weight.(edges(tree_k))))
-tree_p, c_p = one_tree(g, prim, nodes(g)[1])
+# tree_p, c_p = one_tree(g, prim, nodes(g)[1])
 # println("Prim 1 tree weight:",sum(weight.(edges(tree_p))))
 # show.(edges(tree_p))
 
