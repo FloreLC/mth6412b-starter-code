@@ -76,20 +76,18 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
             set_weight!(edge, max(0,og_weights[edge] - dict_pi[n1] - dict_pi[n2]))
  
         end
-        @show og_weights[edges(g)[11]]
-        @show weight(edges(g)[11])
+       
         # construct the 1-tree
-        OneTree, TreeDegree = one_tree(g, algorithm, root)
-        @show degrees(TreeDegree)
+ 
+        OneTree, TreeDegree = one_tree(Graph{T}("", nodes(g), copy(edges(g))), algorithm, root)
+        show(OneTree)
         #################################################################
         ################## STEP 3: Update the cost ######################
         #################################################################
         # compute the total cost of the 1-tree
         TreeCost = sum(weight.(edges(OneTree)))
         # update the cost
-        @show dict_pi
-        @show values(dict_pi)
-        @show 2*sum(values(dict_pi))
+
         dual_cost = TreeCost - 2*sum(values(dict_pi))
         @show dual_cost
         #################################################################
@@ -156,18 +154,20 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
         #################################################################
         # compute the norm
         norm_degree = sqrt(sum(values(degrees(TreeDegree)) .^ 2))
-        @show norm_degree
+        #@show norm_degree
         # update the step size
         @show step
         @show incumbent
         @show dual_cost
-       # step = (step) * (incumbent - dual_cost ) / norm_degree 
+        # if incumbent - dual_cost > 0
+        #     step = (step) * (incumbent - dual_cost ) / norm_degree 
+        # end
       
         #################################################################
         ################ STEP 8: Update reduced costs ###################
         #################################################################
         # if not adaptive graph_degree and graph_degree_prev are equal
-        @show graph_degree
+    
         # @show graph_degree_prev
         for n in nodes(g)
             
@@ -175,8 +175,11 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
             #PI[k] = PI[k] + step*graph_degree[k]
             # PI[k] = Int(round(PI[k])) # this will no longer be necessary if changing the structure of the edge
             dict_pi[n] = dict_pi[n] - step * (degree(TreeDegree, n) - 2)
+            show(n)
+            @show dict_pi[n]
+            @show degree(TreeDegree, n)
         end
-     
+        
         #################################################################
         ################ STEP 8: Update reduced costs ###################
         #################################################################
@@ -202,13 +205,14 @@ function LinKernighan(g::Graph{T}, algorithm::Function, root::Node{T}, max_itera
         # replace the weight of the edge in g whose ends are n1 and n2
         # set_weight!(edge, weight(get_edge(g, n1, n2)))
         set_weight!(get_edge(OneTree, n1, n2), weight(get_edge(g, n1, n2)))
+        
     end
     # update the 1-tree cost
     TreeCost = sum(weight.(edges(OneTree)))
 
     # updates the time
     elapsed_time = time() - starting_time
-
+    
     return OneTree, TreeCost, Tour, elapsed_time
 
 end
