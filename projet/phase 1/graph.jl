@@ -150,8 +150,8 @@ Pour lancer le programme:
 function build_graph(filename::String)
   # graph_nodes, graph_edges, edges_brut, weights = read_stsp("filename")
 
-  graph_nodes, graph_edges, edges_brut, weights = read_stsp("instances/stsp/$(filename)")
-  header = read_header("instances/stsp/$(filename)")
+  graph_nodes, graph_edges, edges_brut, weights = read_stsp(filename)
+  header = read_header(filename)
  
   graph_name = split( last(split(filename, "/")), ".")[1]
   ### Construire les nodes

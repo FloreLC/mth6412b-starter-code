@@ -60,8 +60,6 @@ println("---------------------------------------------------")
 """
 Prend en parametre un graphe et renvoi une tournée de poids minimum en utilisant l'algorithme de RSL
 """
-
-
 function create_child!(g::Graph{T}, parent::Tree{T}, deja_la::Vector{Node{T}}) where T
     root = Node{T}(name(parent), data(parent))
     for n in nodes(g)
