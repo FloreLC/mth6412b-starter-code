@@ -1,29 +1,26 @@
-module LK_module
-include("./Comp_module.jl")
-include("../phase 1/graph.jl")
-using .Comp_module
 
-export lin_kernighan
-
+import Base.isequal
+using Random
+include("MST_module.jl")
+const SEED = 42
 """
 Takes as parameters a graph, an algorithm for MST, a root (or nothing in whose case the root is randomly selected at each iteration),
 iteration limit, time limit, step size as a vector of two numbers to bound the random number generator, an adaptive as a boolean to indicate whether
 the step size update uses a fraction (0.3) of the previous result. It returns the best solution found as a graph, its cost, whether it is a tour
 and the elapsed time it took.
 """
-function lin_kernighan(g::Graph, algorithm::Function, root::Union{Node, nothing}, max_iterations::Int64, max_time::Int64, step::Vector{Float64,Float64}, adaptive::Bool) where T
+function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing, Node{T}}, max_iterations::Int64, max_time::Int64, step::Vector{Float64}, adaptive::Bool) where T
 
     # call the required libraries
-    using Random
-    Random.seed!(seed) # set the seed for the random number generator
+    Random.seed!(SEED) # set the seed for the random number generator
     
     # clocks the time
     starting_time = time()
     elapsed_time = time() - starting_time
     
     # creates starting objects to iteratively modify them
-    one_tree = Graph{T}()
-    tree_comp = zeros(Int, nb_nodes(g))
+    one_tree = Graph()
+    tree_comp = zeros(Int, nb_nodes(graph))
     tree_cost = 0
     dual_cost = 0
 
@@ -42,7 +39,7 @@ function lin_kernighan(g::Graph, algorithm::Function, root::Union{Node, nothing}
 
     # create a dictionary with the original weights
     og_weights = Dict{Edge, Float64}()
-    for e in edges(g)
+    for e in edges(graph)
         og_weights[e] = weight(e)
     end
 
@@ -74,19 +71,19 @@ function lin_kernighan(g::Graph, algorithm::Function, root::Union{Node, nothing}
         
         # construct the 1-tree and the degree of the nodes
         if !isnothing(root)
-            global one_tree, tree_comp = one_tree(Graph{T}("", nodes(g), copy(edges(g))), algorithm, root)
+              one_tree, tree_comp = get_one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, root)
         else
-            global one_tree, tree_comp = one_tree(Graph{T}("", nodes(g), copy(edges(g))), algorithm, nodes(graph)[rand(1:nb_nodes(graph))])
+            global one_tree, tree_comp = one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, nodes(graph)[rand(1:nb_nodes(graph))])
         end
         
         # compute the total cost of the 1-tree
-        global tree_cost = sum(weight.(edges(one_tree)))
+         tree_cost = sum(weight.(edges(one_tree)))
 
         # compute the lagrangian
-        global dual_cost = tree_cost - 2*sum(values(dict_pi))
+         dual_cost = tree_cost - 2*sum(values(dict_pi))
 
         # update the incumbent
-        global incumbent = max(incumbent, dual_cost)
+        incumbent = max(incumbent, dual_cost)
 
         # getting the difference with a degree of 2
         if !adaptive
@@ -126,9 +123,9 @@ function lin_kernighan(g::Graph, algorithm::Function, root::Union{Node, nothing}
             println("---------------------------------------------")
             # indicator to check whether the solution is a tour
             global is_tour = true
-
+      
             # updates the time
-            global elapsed_time = time() - starting_time
+            elapsed_time = time() - starting_time
 
             return one_tree, tree_cost, is_tour, elapsed_time
             break
@@ -143,10 +140,10 @@ function lin_kernighan(g::Graph, algorithm::Function, root::Union{Node, nothing}
         end
 
         # increase the counter
-        global iter = iter + 1
+        iter = iter + 1
 
         # updates the time
-        global elapsed_time = time() - starting_time
+        elapsed_time = time() - starting_time
     end
 
     #### now it actually print out according to the progress and not when going out of the loop
@@ -158,40 +155,4 @@ function lin_kernighan(g::Graph, algorithm::Function, root::Union{Node, nothing}
     end
     
     return one_tree, tree_cost, is_tour, elapsed_time
-end
-
-"""
-Take a graph, an algorithm and a root, and build a one-tree with this root. Returns the tree (a graph struct) and a component structure describing the tree.
-"""
-function one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
-    # Lists the edges adjacents to the root
-    to_remove = get_all_edges_with_node(g, root)
-
-    # Creates a vector of all graph's node except the root 
-    nodes_copy = nodes(g)[findall(x->name(x)!=name(root),nodes(g))]
-
-   # Creates a vector of all graphs edges except the edges adjacent to the root 
-    edges_copy = filter(x -> !(x in to_remove), edges(g))
-
-    # Gets the MST tree and its corresponding connex component c for the subgraph g[V\{root}]
-    tree , c = algorithm(Graph{T}("", nodes_copy, edges_copy))
- 
-    #Sorts the remaining edges by weight
-    edge_sorted = sort(to_remove, by=weight)
-
-    # Add the root and 2 cheapest arcs from the root to a leaf
-    # Keep the component c updated
-    # ATTENTION: from now on, because the tree is now a 1-tree, the component c does not contain the information for the edges touching root. 
-    # We are keeping the degree dictionary updated
-    add_node!(tree, root)
-    for i in 1:2
-        e = pop!(edge_sorted)
-        add_edge!(tree, e)
-        # If any of the 2 extremities is root, its degree wont be updated, because it wont be part of the dictionnary yet
-        increase_degree!(c, ends(e)[1]) 
-        increase_degree!(c, ends(e)[2]) 
-    end
-    degrees(c)[root] = 2
-
-    return tree, c
 end

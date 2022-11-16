@@ -1,8 +1,4 @@
-module Comp_module
-import Base.isequal
-include("../phase 1/graph.jl")
-export Component, links, degrees, empty!, degree, set_degree!, increase_degree!, isequal, add_to_comp!, to_components, get_component_with_node, remove_from_comp!, merge_comp!, add_nodes_at!
-
+# include("../phase 1/graph.jl")
 """Type abstrait de composantes connexes"""
 abstract type AbstractComp{T} end
 
@@ -168,5 +164,3 @@ function add_nodes_at!(comp1::AbstractComp{T}, comp2::AbstractComp{T}, e::Abstra
 end
 
 
-
-end

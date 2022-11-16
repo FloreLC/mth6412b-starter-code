@@ -1,10 +1,3 @@
-module RSL_module
-include("../phase 1/graph.jl")
-include("./Comp_module.jl")
-using .Comp_module
-
-export rsl
-
 
 mutable struct Tree{T} 
     node::Node{T}
@@ -95,6 +88,3 @@ function has_triang_ineg(g::Graph{T}) where T
    return all(resultats)
 end
 
-
-
-end
