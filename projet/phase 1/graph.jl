@@ -155,3 +155,10 @@ function copy(g::Graph{T}) where T
   return Graph{T}(new_name, new_nodes, new_edges)
 end
 
+function max_degre(graph::Graph)
+  degres = Vector{Int}()
+  for n in nodes(graph)
+    push!(degres, length(get_associated_edges(graph,n)))
+  end
+  return findmax(degres)[2]
+end

@@ -2,7 +2,7 @@
 import Base.isequal
 using Random
 include("MST_module.jl")
-const SEED = 42
+
 """
 Takes as parameters a graph, an algorithm for MST, a root (or nothing in whose case the root is randomly selected at each iteration),
 iteration limit, time limit, step size as a vector of two numbers to bound the random number generator, an adaptive as a boolean to indicate whether
@@ -12,7 +12,7 @@ and the elapsed time it took.
 function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing, Node{T}}, max_iterations::Int64, max_time::Int64, step::Vector{Float64}, adaptive::Bool) where T
 
     # call the required libraries
-    Random.seed!(SEED) # set the seed for the random number generator
+   
     
     # clocks the time
     starting_time = time()
@@ -152,6 +152,7 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
         println("------ A Hamiltonian tour has not been found -------")
         println("-------- Best lower bound costs $(incumbent) -------")
         println("----------------------------------------------------")
+        tree_cost = incumbent
     end
     
     return one_tree, tree_cost, is_tour, elapsed_time

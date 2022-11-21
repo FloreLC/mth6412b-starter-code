@@ -2,42 +2,51 @@
 mutable struct Tree{T} 
     node::Node{T}
     children::Vector{Tree{T}}
-    parent::Union{Tree{T}, Nothing}
+    parent::Union{Tree{T}, Missing}
 end
 node(t::Tree) = t.node
+children(t::Tree) = t.children
+parent(t::Tree) = t.parent
 
-function rsl(g::Graph{T}, root::Node{T}, algorithm::Function) where T
-    println("Inegalite triangulaire: $(has_triang_ineg(g))")
-    if has_triang_ineg(g)==true
+function rsl(g::Graph{T}, root::Node{T}, algorithm::Function, trig_ineg::Bool) where T
+        # clocks the time
+
+    starting_time = time()
+    elapsed_time = time() - starting_time
+    println("Inegalite triangulaire: $(trig_ineg)")
+    if trig_ineg
        
         #calculer un arbre de recouvrement minimal 
         arbre_graph, composante =algorithm(g)
 
-        tree_structure = Tree{T}(root,  Vector{Tree{T}}(), nothing)
-        create_child!(arbre, tree_structure, [root])
+        tree_structure = Tree{T}(root,  Vector{Tree{T}}(), missing)
+        create_child!(arbre_graph, tree_structure, [root])
 
         tour_nodes = Vector{Node{T}}()
         parcours_preordre!(tree_structure, tour_nodes)
 
         tour_edges = Vector{Edge{T}}()
-        for i in 1:(length(list) - 1)
-            e = get_edge(g, Node{T}(name(list[i]), data(list[i])), Node{T}(name(list[i+1]), data(list[i+1])))
+        for i in 1:(length(tour_nodes) - 1)
+            e = get_edge(g, Node{T}(name(tour_nodes[i]), data(tour_nodes[i])), Node{T}(name(tour_nodes[i+1]), data(tour_nodes[i+1])))
             if !(isnothing(e))
                 push!(tour_edges, e)
             end
         end
-        e = get_edge(g, Node{T}(name(list[1]), data(list[1])), Node{T}(name(list[end]), data(list[end])))
+        e = get_edge(g, Node{T}(name(tour_nodes[1]), data(tour_nodes[1])), Node{T}(name(tour_nodes[end]), data(tour_nodes[end])))
         if !(isnothing(e))
             push!(tour_edges, e)
         else
             println("Aucun tour n'a ete trouvé")
-            return nothing
+            elapsed_time = time() - starting_time
+            return missing, missing, elapsed_time
         end
         poids = sum(weight.(tour_edges))
         println("Poids de la tournee: $(poids)")
-        return Graph{T}("RSL_Tour de $(name(g))", nodes(g), tour_edges)
+        elapsed_time = time() - starting_time
+        return Graph{T}("RSL_Tour de $(name(g))", nodes(g), tour_edges), poids, elapsed_time
     end
-    return nothing
+    elapsed_time = time() - starting_time
+    return missing, missing, elapsed_time
 end
 
 
@@ -58,13 +67,13 @@ function create_child!(g::Graph{T}, parent::Tree{T}, deja_la::Vector{Node{T}}) w
     parent
 end
 
-function parcours_preordre!(root::Tree{T}, list::Vector{Node{T}}) where T
+function parcours_preordre!(root::Tree{T}, tour_nodes::Vector{Node{T}}) where T
     isnothing(root) && return 
-    push!(list, node(root))
-    for t in children(tree)
-        parcours_preordre!(t, list)
+    push!(tour_nodes, node(root))
+    for t in children(root)
+        parcours_preordre!(t, tour_nodes)
     end
-    list
+    tour_nodes
 end
 
 """

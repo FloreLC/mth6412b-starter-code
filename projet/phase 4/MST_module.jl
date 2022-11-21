@@ -17,7 +17,7 @@ function kruskal(g::Graph{T}) where T
         comp1 = get_component_with_node(tree_comps, new1)
         comp2 = get_component_with_node(tree_comps, new2)
 
-        if !isequal(comp1, comp2)
+        if !isequal(comp1, comp2) && !isnothing(comp1) && !isnothing(comp2)
             push!(edges_selected, e)
           
             add_nodes_at!(comp1, comp2, e)
