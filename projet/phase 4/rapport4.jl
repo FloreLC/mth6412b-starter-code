@@ -31,21 +31,28 @@ for j in 1:n
 	
 	data_lk, header_lk = readdlm(joinpath("results",  "$(i)_lk.csv"),',', header=true)
 	data_rsl, header_rsl = readdlm(joinpath("results",  "$(i)_rsl.csv"),',', header=true)
-	gap_lk = (data_lk[:,6] .- solutions[j]) ./ solutions[j]
+	gap_lk = abs.(data_lk[:,6] .- solutions[j]) ./ solutions[j]
 	mask = data_rsl[:,3] .== ""
 	data_rsl[mask, 3] .= NaN
 
-	gap_rsl = (data_rsl[:,3] .- solutions[j]) ./ solutions[j]
+	gap_rsl = abs.(data_rsl[:,3] .- solutions[j]) ./ solutions[j]
 	(min_gap_rsl, i_rsl) = findmin(gap_rsl)
 	(min_gap_lk, i_lk) = findmin(gap_lk)
-	output = string(output,"\n\n Instance ", i, " meilleur gap avec RSL : ", min_gap_rsl *100, "\n\n- Choix de la racine : ",data_rsl[i_rsl, 1], "\n\n- MST Algorithme : ",data_rsl[i_rsl, 2],"\n\n Instance ", i, " meilleur gap avec LK : ",min_gap_lk * 100,"\n\n- Choix de la racine : ",data_lk[i_lk, 1],"\n\n- MST Algorithme : ",data_lk[i_lk, 2],"\n\n- Step : ",data_lk[i_lk, 3], "\n\n- Adaptive step : ",data_lk[i_lk, 4])
+	output = string(output,"\n\n Instance ", i, " meilleur gap avec RSL : ", min_gap_rsl *100, "\n\n- Choix de la racine : ",data_rsl[i_rsl, 1], "\n\n- MST Algorithme : ",data_rsl[i_rsl, 2],"\n\n- Resolu en ",data_rsl[i_rsl,4]," s","\n\n Instance ", i, " meilleur gap avec LK : ",min_gap_lk * 100,"\n\n- Choix de la racine : ",data_lk[i_lk, 1],"\n\n- MST Algorithme : ",data_lk[i_lk, 2],"\n\n- Step : ",data_lk[i_lk, 3], "\n\n- Adaptive step : ",data_lk[i_lk, 4],"\n\n- Resolu en ",data_lk[i_lk,7]," s")
 
 end
-	display(Markdown.parse(output))
+	Markdown.parse(output)
 end
 
 # ╔═╡ 29472951-d16d-4a07-8588-7de6aa2abda1
-
+md"""
+## Observations
+Certaines des plus grosses instances n'ont pas pu etre resolues en un temps raisonnable. Nous nous contentons donc des resultats precedents. \
+On peut observer les tendances suivantes:
+- C'est le plus souvent l'algorithme de Kruskal (pour les arbres couvrants minimaux) qui participe aux meilleurs resultats.
+- Le choix de la racine importe peu, meme si de meilleures resultats sont observés avec un choix de racines aleatoires.
+- Le choix du pas et de l'algorithme pour le mettre à jour dépendent fortement de l'instance.
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1056,10 +1063,10 @@ version = "1.4.1+0"
 
 # ╔═╡ Cell order:
 # ╠═fddf7bee-69e6-11ed-3bff-0b649c37e4a3
-# ╠═a8a687d2-40d9-41df-bb17-f9de97b01c79
+# ╟─a8a687d2-40d9-41df-bb17-f9de97b01c79
 # ╠═3ebf445d-2771-4cae-ac1d-fc63744a1a8e
 # ╠═96514e7c-f81a-4f71-b6fb-4218fb58a685
-# ╠═8a549661-f920-43b2-8a98-2ddb42d12ad8
-# ╠═29472951-d16d-4a07-8588-7de6aa2abda1
+# ╟─8a549661-f920-43b2-8a98-2ddb42d12ad8
+# ╟─29472951-d16d-4a07-8588-7de6aa2abda1
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
