@@ -20,17 +20,28 @@ solutions =[1610, 2020, 25395,699,937,2085,5046,11461];
 
 # ╔═╡ 8a549661-f920-43b2-8a98-2ddb42d12ad8
 begin 
+plots = []
+n =length(instances)
+output = "\n"
 
-for j in 1:length(instances)
+
+for j in 1:n
 
 	i = instances[j]
-	title = "Gap en fonction des parametres, $(i)"
+	
 	data_lk, header_lk = readdlm(joinpath("results",  "$(i)_lk.csv"),',', header=true)
 	data_rsl, header_rsl = readdlm(joinpath("results",  "$(i)_rsl.csv"),',', header=true)
 	gap_lk = (data_lk[:,6] .- solutions[j]) ./ solutions[j]
-	#gap_rsl = (data_rsl[:,3] .- solutions[j]) ./ solutions[j]
-	@show plot(gap_lk, title = title)
+	mask = data_rsl[:,3] .== ""
+	data_rsl[mask, 3] .= NaN
+
+	gap_rsl = (data_rsl[:,3] .- solutions[j]) ./ solutions[j]
+	(min_gap_rsl, i_rsl) = findmin(gap_rsl)
+	(min_gap_lk, i_lk) = findmin(gap_lk)
+	output = string(output,"\n\n Instance ", i, " meilleur gap avec RSL : ", min_gap_rsl *100, "\n\n- Choix de la racine : ",data_rsl[i_rsl, 1], "\n\n- MST Algorithme : ",data_rsl[i_rsl, 2],"\n\n Instance ", i, " meilleur gap avec LK : ",min_gap_lk * 100,"\n\n- Choix de la racine : ",data_lk[i_lk, 1],"\n\n- MST Algorithme : ",data_lk[i_lk, 2],"\n\n- Step : ",data_lk[i_lk, 3], "\n\n- Adaptive step : ",data_lk[i_lk, 4])
+
 end
+	display(Markdown.parse(output))
 end
 
 # ╔═╡ 29472951-d16d-4a07-8588-7de6aa2abda1
