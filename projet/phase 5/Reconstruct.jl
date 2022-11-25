@@ -8,29 +8,31 @@ filename = "nikos-cat.png"
 picture = load("projet/phase 5/shredder-julia/images/shuffled/$(filename)")
 
 # create the object
-g = Graph{Vector{Float64}}(filename, Vector{Node}(), Vector{Edge}())
+g = Graph{Int}(filename, Vector{Node}(), Vector{Edge}())
 
 # add –fake– node as a source
-add_node!(g, Node('s', 's'))
+add_node!(g, Node("s", 0))
 
 # considers each column as a node
-for i in 1 : size(picture, 2)
+for i in 1:size(picture, 2)
     # add a node for each column
+    
     add_node!(g, Node(string(i), i))
 
     # add the zero weight from the -fake- source to each node
-    add_edge!(g, Edge((get_node(g, 's'), get_node(g, string(i))), 0))
+    add_edge!(g, Edge((get_node(g, "s"), get_node(g, string(i))), 0.0))
 end
 
 # add the edges between the other nodes
-for i in 1 : size(picture, 2)
-    for j in 1 : size(picture, 2)
+for i in 1:size(picture, 2)
+    for j in 1:size(picture, 2)
         # compute the weight of the edge and add the edge
         # as the matrix is symmetric, then skip the lower triangular matrix as well as the diagonal
+        weight = 0.0
         if i >= j
             continue
         else
-            weight = compare_columns(picture[:,i], picture[:,j])
+            weight = convert(Float64,compare_columns(picture[:,i], picture[:,j]))
             # add the edge
             add_edge!(g, Edge((get_node(g, string(i)), get_node(g, string(j))), weight))
         end
