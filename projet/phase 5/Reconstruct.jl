@@ -20,7 +20,7 @@ for i in 1:size(picture, 2)
     add_node!(g, Node(string(i), i))
 
     # add the zero weight from the -fake- source to each node
-    add_edge!(g, Edge((get_node(g, 0), get_node(g, i)), 0.0))
+    add_edge!(g, Edge((get_node(g, "s"), get_node(g, string(i))), 0.0))
 end
 
 # add the edges between the other nodes
@@ -28,13 +28,13 @@ for i in 1:size(picture, 2)
     for j in 1:size(picture, 2)
         # compute the weight of the edge and add the edge
         # as the matrix is symmetric, then skip the lower triangular matrix as well as the diagonal
-        weight = 0.0
+        local weight = 0.0
         if i >= j
             continue
         else
-            weight = convert(Float64,compare_columns(picture[:,i], picture[:,j]))
+            local weight = convert(Float64,compare_columns(picture[:,i], picture[:,j]))
             # add the edge
-            add_edge!(g, Edge((get_node(g, i), get_node(g, j)), weight))
+            add_edge!(g, Edge((get_node(g,string(i) ), get_node(g, string(j))), weight))
         end
     end
 end
