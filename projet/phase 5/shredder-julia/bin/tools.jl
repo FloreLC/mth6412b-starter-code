@@ -1,3 +1,9 @@
+# using Pkg
+# Pkg.add("Random")
+# Pkg.add("FileIO")
+# Pkg.add("Images")
+# Pkg.add("ImageView")
+# Pkg.add("ImageMagick")
 using Random, FileIO, Images, ImageView, ImageMagick
 
 """Compute the similarity score between two pixels."""
@@ -6,6 +12,11 @@ function compare_pixels(p1, p2)
 	r2, g2, b2 = red(p2), green(p2), blue(p2)
 	return abs(r1-r2) + abs(g1-g2) + abs(b1-b2)
 end
+
+# picture = load()
+# compare the columns. the output corresponds to the weight of
+# the edge
+# compare_columns(picture[:,1], picture[:,2])
 
 """Compute the similarity score between two columns of pixels in an image."""
 function compare_columns(col1, col2)
@@ -28,6 +39,8 @@ function score_picture(filename::String)
 	return score
 end
 
+# the tour should be an array giving the order of the nodes
+# the cost is the output of score_picture
 """Write a tour in TSPLIB format."""
 function write_tour(filename::String, tour::Array{Int}, cost::Float32)
 	file = open(filename, "w")
@@ -59,6 +72,8 @@ function shuffle_picture(input_name::String, output_name::String; view::Bool=fal
 	save(output_name, shuffled_picture)
 end
 
+# the tour is the previously created file from write_tour and
+# input name is the 'fuzzy' image to be reconstructed
 """Read a tour file and a shuffle image, and output the image reconstructed using the tour."""
 function reconstruct_picture(tour_filename::String, input_name::String, output_name::String; view::Bool=false)
 	tour = Int[]
