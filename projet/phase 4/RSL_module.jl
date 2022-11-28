@@ -80,6 +80,17 @@ function parcours_preordre!(root::Tree{T}, tour_nodes::Vector{Node{T}}) where T
     tour_nodes
 end
 
+function parcours_postordre!(root::Tree{T}, tour_nodes::Vector{Node{T}}) where T
+    isnothing(root) && return 
+    
+    for t in children(root)
+        parcours_postordre!(t, tour_nodes)
+    end
+    push!(tour_nodes, node(root))
+    tour_nodes
+end
+
+
 """
 Renvoi true si l'inégalité triangulaire est vérifiée dans un graphe g , false sinon
 """
@@ -111,5 +122,15 @@ function parcours_preordre!(t::Graph{T}, root::Node{T}) where T
 
     tour_nodes = Vector{Node{T}}()
     parcours_preordre!(tree_structure, tour_nodes)
+    return tour_nodes
+end
+
+
+function parcours_postordre!(t::Graph{T}, root::Node{T}) where T
+    tree_structure = Tree{T}(root,  Vector{Tree{T}}(), missing)
+    create_child!(t, tree_structure, [root])
+
+    tour_nodes = Vector{Node{T}}()
+    parcours_postordre!(tree_structure, tour_nodes)
     return tour_nodes
 end
