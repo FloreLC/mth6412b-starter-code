@@ -163,4 +163,38 @@ function add_nodes_at!(comp1::AbstractComp{T}, comp2::AbstractComp{T}, e::Abstra
     comp1
 end
 
+function parcours_cycle(comp::AbstractComp, start_node::AbstractNode)
+    parcours = Vector{Int}()
+    lin = links(comp1)
+    current = start_node
+    
+    while haskey(lin, current)
+        next = lin[current]
+        push!(parcours, data(current))
+        current = next
+    end
+    return parcours
+end
 
+
+
+function parcours_cycle(g::Graph)
+    parcours = Vector{Int}()
+    prev = get_node(g, "s")
+    current = get_node(g, "s")
+    next = get_all_neighbours(g, get_node(g, "s"))[1]
+    while name(next) != "s"
+        push!(parcours, data(next))
+        prev = current
+        current = next
+        tmp = get_all_neighbours(g, current)
+        @show tmp
+        if name(tmp[1]) == name(prev)
+            next = tmp[2]
+        else
+            next = tmp[1]
+        end
+    end
+    @show parcours
+    return parcours
+end

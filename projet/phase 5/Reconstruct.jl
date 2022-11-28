@@ -3,9 +3,9 @@ include("../phase 1/graph.jl")
 include("../phase 4/RSL_module.jl")
 include("../phase 4/LK_module.jl")
 include("shredder-julia/bin/tools.jl")
-
-filename = "nikos-cat.png"
-picture = load("projet/phase 5/shredder-julia/images/shuffled/$(filename)")
+const PROJECT_PATH = "/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet"
+filename = "blue-hour-paris"
+picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png")
 
 # create the object
 g = Graph{Int}(filename, Vector{Node}(), Vector{Edge}())
@@ -16,7 +16,6 @@ add_node!(g, Node("s", 0))
 # considers each column as a node
 for i in 1:size(picture, 2)
     # add a node for each column
-    
     add_node!(g, Node(string(i), i))
 
     # add the zero weight from the -fake- source to each node
@@ -43,31 +42,49 @@ end
 # ------------------------ compute the tour ------------------------ #
 # ------------------------------------------------------------------ #
 
-######## using RSL ########
+###### using RSL ########
+println("Checking ineg")
 trig_ineg = has_triang_ineg(g)
-tour_rsl, cost_rsl, time_rsl = rsl(g, Node("s", 0), kruskal, trig_ineg)
+@show trig_ineg
+tour_rsl, cost_rsl, time_rsl = rsl(g, Node("s", 0), kruskal, trig_ineg; TL = 60)
 
-# HERE WE NEED TO GET THE NODES PARSED ONTO AND ARRAY OF INTEGERS
-# without considering the -fake- source node
-tour_rsl_array = [data(node) for node in filter!(i -> i != Node("s", 0), nodes(tour_rsl))]
-
-# export the tour
-write_tour("shredder-julia/tsp/tours/$("RSL_" * filename)", tour_rsl_array, score_picture("projet/phase 5/shredder-julia/images/shuffled/$(filename)"))
-
-# create the reconstructed image from the tour
-reconstruct_picture("shredder-julia/tsp/tours/$("RSL_" * filename)", "projet/phase 5/shredder-julia/images/shuffled/$(filename)",
-                    "shredder-julia/images/reconstructed/$("RSL_" * filename)"; true)
-
-######## using LK ########
-tour_lk, cost_lk, is_tour_lk, time_lk = lin_kernighan(g, kruskal, Node("s", 0), 1000, 60, [1.0, 2.0], true)
-
-# HERE WE NEED TO GET THE NODES PARSED ONTO AND ARRAY OF INTEGERS
-# without considering the -fake- source node
-tour_lk_array = [data(node) for node in filter!(i -> i != Node("s", 0), nodes(tour_lk))]
+tour_nodes = parcours_preordre!(tour_rsl, get_node(tour_rsl, "s"))
+@show data.(tour_nodes)
+position = findfirst(x -> name(x) == "s", tour_nodes)
+deleteat!(tour_nodes, position)
+tour_rsl_array =  data.( tour_nodes)
 
 # export the tour
-write_tour("shredder-julia/tsp/tours/$("LK_" * filename)", tour_lk_array, score_picture("projet/phase 5/shredder-julia/images/shuffled/$(filename)"))
+write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename).tour", tour_rsl_array, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
 
 # create the reconstructed image from the tour
-reconstruct_picture("shredder-julia/tsp/tours/$("LK_" * filename)", "projet/phase 5/shredder-julia/images/shuffled/$(filename)",
-                    "shredder-julia/images/reconstructed/$("LK_" * filename)"; true)
+reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename).tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
+PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename).png"; view = true)
+
+# ######## using LK ########
+# println("starting LK")
+
+# #### With adaptive = rtue theres some issues
+# tour_lk, cost_lk, is_tour_lk, time_lk , tour_comp_lk, graph_modified_weight = lin_kernighan(g, kruskal, get_node(g,"s"), 1000, 200, [1.0, 2.0], true)
+
+# if !is_tour_lk
+#     to_remove = get_all_neighbours(tour_lk, get_node(tour_lk, "s"))
+#     index_to_remove_1 = get_edge_index_in_list(edges(tour_lk), get_node(tour_lk, "s"), to_remove[1])
+#     deleteat!(edges(tour_lk), index_to_remove_1)
+#     index_to_remove_2 = get_edge_index_in_list(edges(tour_lk), get_node(tour_lk, "s"), to_remove[2])
+#     deleteat!(edges(tour_lk), index_to_remove_2)
+#     deleteat!(nodes(tour_lk), findfirst(x -> name(x) == "s", nodes(tour_lk)))
+#     tour_nodes = parcours_preordre!(tour_lk, to_remove[1])
+#     @show data.(tour_nodes)
+#     tour_lk_array =  data.( tour_nodes)
+# else
+#     tour_lk_array = Vector{Int}()
+#     neigh = get_all_neighbours(tour_lk, get_node(g, "s"))
+#     tour_lk_array = [get_node(g, "s"), parcours_cycle(tour_comp_lk, neigh[1])]
+# end
+# # export the tour
+# write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename).tour", tour_lk_array, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
+
+# # create the reconstructed image from the tour
+# reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename).tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
+# PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename).png"; view = true)

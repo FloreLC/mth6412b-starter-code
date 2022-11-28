@@ -123,6 +123,7 @@ end
 Take a graph, an algorithm and a root, and build a one-tree with this root. Returns the tree (a graph struct) and a component structure describing the tree.
 """
 function get_one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
+    println("get one tree")
     # List the edges adjacents to the root
     to_remove = get_all_edges_with_node(g, root)
 
@@ -137,15 +138,11 @@ function get_one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
 
     #### the degree should not be filtered to 1 degree nodes but anyone since
     #### we need a cycle
-
-    #leaves = filter(kv -> kv.second ==1, degrees(c))
     leaves = filter(kv -> kv.second >= 0, degrees(c))
 
     #edges_candidates = Vector{Edge{T}}()
 
     # Gather all the edges between root and the MST leaves
-   
-
     # Order this edges by weight
     edge_sorted = sort(to_remove, by=weight)
 
@@ -154,14 +151,32 @@ function get_one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
     # ATTENTION: from now on, because the tree is now a 1-tree, the component c does not contain the information for the edges touching root. 
     # We are keeping the degree dictionary updated
     add_node!(tree, root)
+    newly_added_to = Vector{Node{T}}() 
     for i in 1:2
         e = pop!(edge_sorted)
-
+   
         add_edge!(tree, e)
-        # If any of the 2 extremities is root, its degree wont be updated, because it wont be part of the dictionnary yet
-        increase_degree!(c, ends(e)[1]) 
-        increase_degree!(c, ends(e)[2]) 
+        u,v = ends(e)
+        if name(u) == name(root)
+            push!(newly_added_to,v)
+            increase_degree!(c, v) 
+        else
+            push!(newly_added_to,u)
+            increase_degree!(c, u) 
+        end
+        
     end
     degrees(c)[root] = 2
+    #node = pop!(newly_added_to)
+   # links(c)[root] = node
+    node = pop!(newly_added_to)
+    #links(c)[node] = root
     return tree, c
+end
+
+
+
+function heuristic_tour(g::Graph)
+    @show max_degre(g)
+
 end

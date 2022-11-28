@@ -63,7 +63,7 @@ nb_edges(graph::AbstractGraph) = length(graph.edges)
 
 function test_graph()
 
-  g = Graph{Char}()
+  g = Graph{Char}("", Vector{Node{Char}}(),Vector{Edge{Char}}())
   for i in 1:9
     n = Node(string('a' + i-1), 'a' + i-1)
     add_node!(g, n)
@@ -82,6 +82,23 @@ function test_graph()
   add_edge!(g, Edge((get_node(g, "d"), get_node(g, "f")), 14.0))
   add_edge!(g, Edge((get_node(g, "d"), get_node(g, "e")), 9.0))
   add_edge!(g, Edge((get_node(g, "f"), get_node(g, "e")), 10.0))
+  return g
+end
+
+function test_graph_complet()
+  root = Node("s", 0)
+  g = Graph{Int}("", Vector{Node{Int}}(),Vector{Edge{Int}}())
+  add_node!(g, root)
+  for i in 1:9
+    n = Node(string(i), i)
+    add_node!(g, n)
+  end
+  for i in 1:9
+    add_edge!(g, Edge((get_node(g, "$i"), root), 0.0))
+    for j in (i+1):9
+      add_edge!(g, Edge((get_node(g, "$i"), get_node(g, "$j")), rand(0:3) * 1.0))
+    end
+  end
   return g
 end
 
@@ -123,6 +140,21 @@ function get_edge(g::Graph{T}, n1::Node{T}, n2::Node{T}) where T
   return edges(g)[i]
 end
 
+
+
+function get_edge_index_in_list(vec::Vector{Edge{T}}, n1::Node{T}, n2::Node{T}) where T
+  i = findfirst(x ->name.(ends(x)) == (name(n1), name(n2)) ,vec)
+  if isnothing(i)
+    i = findfirst(x -> name.(ends(x)) == (name(n2), name(n1)) , vec)
+    if isnothing(i) 
+      return 0
+    end
+  end
+
+return i
+end
+
+
 function get_edge_in_list(vec::Vector{Edge{T}}, n1::Node{T}, n2::Node{T}) where T
   i = findfirst(x ->name.(ends(x)) == (name(n1), name(n2)) ,vec)
   if isnothing(i)
@@ -161,4 +193,18 @@ function max_degre(graph::Graph)
     push!(degres, length(get_associated_edges(graph,n)))
   end
   return findmax(degres)[2]
+end
+
+function get_all_neighbours(g::Graph, n::Node)
+  ed = get_associated_edges(g, n)
+  neigh = Vector{Node}()
+  for e in ed
+    a,b = ends(e)
+    if name(a) == name(n)
+      push!(neigh, b)
+    else
+      push!(neigh, a)
+    end
+  end
+  return neigh
 end

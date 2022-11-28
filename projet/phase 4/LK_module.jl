@@ -10,29 +10,28 @@ the step size update uses a fraction (0.3) of the previous result. It returns th
 and the elapsed time it took.
 """
 function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing, Node{T}}, max_iterations::Int64, max_time::Int64, step::Vector{Float64}, adaptive::Bool) where T
-
-    # call the required libraries
-   
-    
+  
     # clocks the time
     starting_time = time()
     elapsed_time = time() - starting_time
     
     # creates starting objects to iteratively modify them
-    one_tree = Graph()
-    tree_comp = zeros(Int, nb_nodes(graph))
+    one_tree = Graph{T}("1tree", Vector{Node{T}}(), Vector{Edge{T}}())
+    tree_comp = Component{T}()
     tree_cost = 0
     dual_cost = 0
 
     # creates a dictionary that indicates the degree of each node in the 1-tree
-    dict_pi = Dict{Node, Float64}()
+    dict_pi = Dict{Node{T}, Float64}()
     for n in nodes(graph)
         dict_pi[n] = 0.0
     end
-    
+
     # creates a dictionary that represents the difference of degree with a tour
-    graph_degree, graph_degree_prev = Dict{Node, Float64}(), Dict{Node, Float64}()
+    graph_degree = Dict{Node, Float64}()
+    graph_degree_prev = Dict{Node, Float64}()
     for n in nodes(graph)
+    
         graph_degree[n] = 0.0
         graph_degree_prev[n] = 0.0
     end
@@ -73,7 +72,7 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
         if !isnothing(root)
               one_tree, tree_comp = get_one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, root)
         else
-            global one_tree, tree_comp = one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, nodes(graph)[rand(1:nb_nodes(graph))])
+             one_tree, tree_comp = get_one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, nodes(graph)[rand(1:nb_nodes(graph))])
         end
         
         # compute the total cost of the 1-tree
@@ -87,20 +86,22 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
 
         # getting the difference with a degree of 2
         if !adaptive
-            for n in nodes(graph)
+            graph_degree[root] = degree(tree_comp, root) - 2
+            graph_degree_prev[root] = graph_degree_prev[root]
+            for n in nodes(graph)[2:end]
                 graph_degree[n] = degree(tree_comp, n) - 2
                 graph_degree_prev[n] = graph_degree_prev[n]
             end
         else
             if iter == 1
                 for n in nodes(graph)
-                    global graph_degree[n] = degree(tree_comp, n) - 2
-                    global graph_degree_prev[n] = graph_degree_prev[n]
+                     graph_degree[n] = degree(tree_comp, n) - 2
+                     graph_degree_prev[n] = graph_degree_prev[n]
                 end
             else
                 for n in nodes(graph)
-                    global graph_degree_prev[n] = graph_degree[n]
-                    global graph_degree[n] = degree(tree_comp, n) - 2
+                     graph_degree_prev[n] = graph_degree[n]
+                     graph_degree[n] = degree(tree_comp, n) - 2
                 end
             end
         end
@@ -116,23 +117,23 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
             end
 
             # update the 1-tree cost
-            global tree_cost = sum(weight.(edges(one_tree)))
+            tree_cost = sum(weight.(edges(one_tree)))
             println("---------------------------------------------")
             println("----- A Hamiltonian tour has been found -----")
             println("---- The tour found has cost $(tree_cost) ----")
             println("---------------------------------------------")
             # indicator to check whether the solution is a tour
-            global is_tour = true
+             is_tour = true
       
             # updates the time
             elapsed_time = time() - starting_time
 
-            return one_tree, tree_cost, is_tour, elapsed_time
+            return one_tree, tree_cost, is_tour, elapsed_time, tree_comp, graph
             break
         end
 
         # update the step size
-        global step_size = rand(step[1]:0.1:step[2]) / iter
+         step_size = rand(step[1]:0.1:step[2]) / iter
 
         # Update reduced costs
         for n in nodes(graph)
@@ -155,5 +156,5 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
         tree_cost = incumbent
     end
     
-    return one_tree, tree_cost, is_tour, elapsed_time
+    return one_tree, tree_cost, is_tour, elapsed_time, tree_comp, graph
 end
