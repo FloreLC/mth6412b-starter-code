@@ -4,7 +4,7 @@ include("../phase 4/RSL_module.jl")
 include("../phase 4/LK_module.jl")
 include("shredder-julia/bin/tools.jl")
 const PROJECT_PATH = "/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet"
-filename = "the-enchanted-garden"
+filename = "abstract-light-painting"
 picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png")
 
 
@@ -12,7 +12,7 @@ picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filenam
 ####### LK PARAM ###################################
 const READ = "pre"
 const STEP = [20.0, 30.0]
-const ADAPT = true
+const ADAPT = false
 const TL = 120
 const ALGO = kruskal
 
@@ -76,7 +76,7 @@ end
 # ######## using LK ########
 println("starting LK")
 
-tour_lk, cost_lk, is_tour_lk, time_lk , tour_comp_lk, graph_modified_weight = lin_kernighan(g, ALGO, get_node(g,"s"), 1000, TL, STEP, ADAPT)
+tour_lk, cost_lk, is_tour_lk, time_lk , tour_comp_lk, graph_modified_weight = lin_kernighan(g, ALGO, get_node(g,"s"), 1000000000, TL, STEP, ADAPT)
 
 if !is_tour_lk
     to_remove = get_all_neighbours(tour_lk, get_node(tour_lk, "s"))
@@ -98,8 +98,8 @@ else
     tour_lk_array = [get_node(g, "s"), parcours_cycle(tour_comp_lk, neigh[1])]
 end
 # export the tour
-write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_lk_$(STEP)_$(ADAPT)_$(ALGO)_$(READ).tour", tour_lk_array, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
+write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_lk_$(STEP)_$(ADAPT)_$(ALGO)_$(READ)_$(TL).tour", tour_lk_array, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
 
 # create the reconstructed image from the tour
-reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_lk_$(STEP)_$(ADAPT)_$(ALGO)_$(READ).tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
-PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename)_lk_$(STEP)_$(ADAPT)_$(ALGO)_$(READ).png"; view = true)
+reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_lk_$(STEP)_$(ADAPT)_$(ALGO)_$(READ)_$(TL).tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
+PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename)_lk_$(STEP)_$(ADAPT)_$(ALGO)_$(READ)_$(TL).png"; view = true)
