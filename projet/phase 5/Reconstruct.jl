@@ -4,7 +4,7 @@ include("../phase 4/RSL_module.jl")
 include("../phase 4/LK_module.jl")
 include("shredder-julia/bin/tools.jl")
 const PROJECT_PATH = "/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet"
-filename = "blue-hour-paris"
+filename = "pizza-food-wallpaper"
 picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png")
 
 # create the object
@@ -46,45 +46,45 @@ end
 println("Checking ineg")
 trig_ineg = has_triang_ineg(g)
 @show trig_ineg
-tour_rsl, cost_rsl, time_rsl = rsl(g, Node("s", 0), kruskal, trig_ineg; TL = 60)
+if trig_ineg
+    tour_rsl, cost_rsl, time_rsl = rsl(g, Node("s", 0), kruskal, trig_ineg; TL = 60)
 
-tour_nodes = parcours_preordre!(tour_rsl, get_node(tour_rsl, "s"))
-@show data.(tour_nodes)
-position = findfirst(x -> name(x) == "s", tour_nodes)
-deleteat!(tour_nodes, position)
-tour_rsl_array =  data.( tour_nodes)
+    tour_nodes = parcours_preordre!(tour_rsl, get_node(tour_rsl, "s"))
+    @show data.(tour_nodes)
+    position = findfirst(x -> name(x) == "s", tour_nodes)
+    deleteat!(tour_nodes, position)
+    tour_rsl_array =  data.( tour_nodes)
 
 # export the tour
-write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename).tour", tour_rsl_array, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
+    write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_rsl.tour", tour_rsl_array, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
 
 # create the reconstructed image from the tour
-reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename).tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
-PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename).png"; view = true)
-
+    reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_rsl.tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
+    PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename)_rsl.png"; view = true)
+end
 # ######## using LK ########
-# println("starting LK")
+println("starting LK")
 
-# #### With adaptive = rtue theres some issues
-# tour_lk, cost_lk, is_tour_lk, time_lk , tour_comp_lk, graph_modified_weight = lin_kernighan(g, kruskal, get_node(g,"s"), 1000, 200, [1.0, 2.0], true)
+tour_lk, cost_lk, is_tour_lk, time_lk , tour_comp_lk, graph_modified_weight = lin_kernighan(g, kruskal, get_node(g,"s"), 10000000,1800, [1.0, 2.0], true)
 
-# if !is_tour_lk
-#     to_remove = get_all_neighbours(tour_lk, get_node(tour_lk, "s"))
-#     index_to_remove_1 = get_edge_index_in_list(edges(tour_lk), get_node(tour_lk, "s"), to_remove[1])
-#     deleteat!(edges(tour_lk), index_to_remove_1)
-#     index_to_remove_2 = get_edge_index_in_list(edges(tour_lk), get_node(tour_lk, "s"), to_remove[2])
-#     deleteat!(edges(tour_lk), index_to_remove_2)
-#     deleteat!(nodes(tour_lk), findfirst(x -> name(x) == "s", nodes(tour_lk)))
-#     tour_nodes = parcours_preordre!(tour_lk, to_remove[1])
-#     @show data.(tour_nodes)
-#     tour_lk_array =  data.( tour_nodes)
-# else
-#     tour_lk_array = Vector{Int}()
-#     neigh = get_all_neighbours(tour_lk, get_node(g, "s"))
-#     tour_lk_array = [get_node(g, "s"), parcours_cycle(tour_comp_lk, neigh[1])]
-# end
-# # export the tour
-# write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename).tour", tour_lk_array, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
+if !is_tour_lk
+    to_remove = get_all_neighbours(tour_lk, get_node(tour_lk, "s"))
+    index_to_remove_1 = get_edge_index_in_list(edges(tour_lk), get_node(tour_lk, "s"), to_remove[1])
+    deleteat!(edges(tour_lk), index_to_remove_1)
+    index_to_remove_2 = get_edge_index_in_list(edges(tour_lk), get_node(tour_lk, "s"), to_remove[2])
+    deleteat!(edges(tour_lk), index_to_remove_2)
+    deleteat!(nodes(tour_lk), findfirst(x -> name(x) == "s", nodes(tour_lk)))
+    tour_nodes = parcours_preordre!(tour_lk, to_remove[1])
+    @show data.(tour_nodes)
+    tour_lk_array =  data.( tour_nodes)
+else
+    tour_lk_array = Vector{Int}()
+    neigh = get_all_neighbours(tour_lk, get_node(g, "s"))
+    tour_lk_array = [get_node(g, "s"), parcours_cycle(tour_comp_lk, neigh[1])]
+end
+# export the tour
+write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_lk.tour", tour_lk_array, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
 
-# # create the reconstructed image from the tour
-# reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename).tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
-# PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename).png"; view = true)
+# create the reconstructed image from the tour
+reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_lk.tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
+PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename)_lk.png"; view = true)

@@ -87,18 +87,20 @@ function has_triang_ineg(g::Graph{T}) where T
    resultats = Vector{Bool}()
    for e in edges(g)
        (new1, new2) = ends(e)
-        println("Checking Ineg T for ")
-        show(e)
-       for new3 in nodes(g)
-           if !isnothing(get_edge(g, new1, new3)) && !isnothing(get_edge(g, new2, new3))
-               if  weight(e) <= weight(get_edge(g, new1, new3))+weight(get_edge(g, new2, new3))
+       if weight(e) > 0.0
+            println("Checking Ineg T for ")
+            show(e)
+            for new3 in nodes(g)
+            if !isnothing(get_edge(g, new1, new3)) && !isnothing(get_edge(g, new2, new3))
+                if  weight(e) <= weight(get_edge(g, new1, new3))+weight(get_edge(g, new2, new3))
                    push!(resultats, true) 
-               else 
+                else 
                    push!(resultats, false)
                    return false
-               end
-           end
-       end
+                end
+            end
+            end
+        end
    end
    return all(resultats)
 end
