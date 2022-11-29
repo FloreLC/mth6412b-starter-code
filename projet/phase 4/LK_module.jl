@@ -9,7 +9,7 @@ iteration limit, time limit, step size as a vector of two numbers to bound the r
 the step size update uses a fraction (0.3) of the previous result. It returns the best solution found as a graph, its cost, whether it is a tour
 and the elapsed time it took.
 """
-function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing, Node{T}}, max_iterations::Int64, max_time::Int64, step::Vector{Float64}, adaptive::Bool) where T
+function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing, Node{T}}, max_iterations::Int64, max_time::Int64, step::Vector{Float64}, adaptive::Bool, rand_root::Bool) where T
   
     # clocks the time
     starting_time = time()
@@ -17,6 +17,7 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
     
     # creates starting objects to iteratively modify them
     one_tree = Graph{T}("1tree", Vector{Node{T}}(), Vector{Edge{T}}())
+    root_tmp = Node{T}("", 0)
     tree_comp = Component{T}()
     tree_cost = 0
     dual_cost = 0
@@ -69,37 +70,44 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
         end
         
         # construct the 1-tree and the degree of the nodes
-        if !isnothing(root)
-              one_tree, tree_comp = get_one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, root)
+        elapsed_time = time() - starting_time
+        if isnothing(root) || rand_root && elapsed_time <= max_time - 2
+            root_tmp = nodes(graph)[rand(1:nb_nodes(graph))]
+            @show root_tmp
+            one_tree, tree_comp, root_tmp = get_one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, root_tmp)
+            
         else
-             one_tree, tree_comp = get_one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, nodes(graph)[rand(1:nb_nodes(graph))])
+            one_tree, tree_comp, root_tmp = get_one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, root)
         end
         
         # compute the total cost of the 1-tree
-         tree_cost = sum(weight.(edges(one_tree)))
+        tree_cost = sum(weight.(edges(one_tree)))
 
         # compute the lagrangian
-         dual_cost = tree_cost - 2*sum(values(dict_pi))
+        dual_cost = tree_cost - 2*sum(values(dict_pi))
 
         # update the incumbent
         incumbent = max(incumbent, dual_cost)
 
         # getting the difference with a degree of 2
         if !adaptive
-            graph_degree[root] = degree(tree_comp, root) - 2
-            graph_degree_prev[root] = graph_degree_prev[root]
-            for n in nodes(graph)[2:end]
+            # graph_degree[root] = degree(tree_comp, root) - 2
+            # graph_degree_prev[root] = graph_degree_prev[root]
+            
+            for n in collect(keys(degrees(tree_comp)))
                 graph_degree[n] = degree(tree_comp, n) - 2
                 graph_degree_prev[n] = graph_degree_prev[n]
             end
         else
             if iter == 1
-                for n in nodes(graph)
+                @show length(collect(keys(degrees(tree_comp))))
+                for n in collect(keys(degrees(tree_comp)))
                      graph_degree[n] = degree(tree_comp, n) - 2
                      graph_degree_prev[n] = graph_degree_prev[n]
                 end
             else
-                for n in nodes(graph)
+                @show length(collect(keys(degrees(tree_comp))))
+                for n in collect(keys(degrees(tree_comp)))
                      graph_degree_prev[n] = graph_degree[n]
                      graph_degree[n] = degree(tree_comp, n) - 2
                 end

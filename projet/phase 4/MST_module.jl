@@ -167,11 +167,13 @@ function get_one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
         
     end
     degrees(c)[root] = 2
+    @show root
+    @show degrees(c)[root]
     #node = pop!(newly_added_to)
    # links(c)[root] = node
     node = pop!(newly_added_to)
     #links(c)[node] = root
-    return tree, c
+    return tree, c, root
 end
 
 
