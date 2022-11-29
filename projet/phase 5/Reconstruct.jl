@@ -11,8 +11,8 @@ picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filenam
 
 ####### LK PARAM ###################################
 const READ = "pre"
-const STEP = [20.0, 30.0]
-const ADAPT = false
+const STEP = [1.0, 2.0]
+const ADAPT = true
 const TL = 120
 const ALGO = kruskal
 

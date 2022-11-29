@@ -171,13 +171,33 @@ Wow("/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet/pha
 md"""
 L'amelioration ne nous semble pas valoir l'invesitssement en ressource.
 ## Pas adaptable
-Enfin, nous comparons nos resultats avec et sans le pas adaptable sur quelques instances avec une limite de temps de 2min. un pas de [20.0, 30.0] et l'algorithme de Kruskal pour les MST:
-#### 
-
+Enfin, nous comparons nos resultats avec et sans le pas adaptable sur quelques instances avec une limite de temps de 2min, un pas de [1.0, 2.0] et l'algorithme de Kruskal pour les MST:
+- Sans le pas adaptable
 """
 
 # ╔═╡ 41691877-4cb2-47ba-8787-47dd675d5d39
+Wow("/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet/phase 5/shredder-julia/images/reconstructed/marlet2-radio-board_lk_[1.0, 2.0]_false_kruskal_pre_120.png")
 
+# ╔═╡ a63c2255-3466-421b-9783-040fa0be2bac
+md"""
+- Avec le pas adaptable
+"""
+
+# ╔═╡ 3464e994-1557-4280-979a-2da40ac2ac14
+Wow("/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet/phase 5/shredder-julia/images/reconstructed/marlet2-radio-board_lk_[1.0, 2.0]_true_kruskal_pre_120.png")
+
+# ╔═╡ 7ad9cc87-a71a-4dd1-bce0-de45320de000
+md"""
+- Image originale:
+"""
+
+# ╔═╡ 44ff3522-ac51-4605-a0a2-7d79874e9516
+Wow("/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet/phase 5/shredder-julia/images/original/marlet2-radio-board.png")
+
+# ╔═╡ 806e7f6f-a9b8-466c-9ead-13090682369f
+md"""
+On observe que bine que le pas adaptable donne des "clusters" de colonnes plus larges, les coutours des elements principaux restent bien visible avec ou sans le pas adaptable.
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -444,7 +464,12 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─fca334e1-06f9-41ee-bc21-41a2ee848d9b
 # ╟─b2d7c3e0-8b56-4637-9ea5-a6751b973fbf
 # ╟─e953b5cd-b313-4c29-b908-bcb646e81b9f
-# ╠═8c793f92-e4ef-46e6-abc9-788a8f88c619
-# ╠═41691877-4cb2-47ba-8787-47dd675d5d39
+# ╟─8c793f92-e4ef-46e6-abc9-788a8f88c619
+# ╟─41691877-4cb2-47ba-8787-47dd675d5d39
+# ╟─a63c2255-3466-421b-9783-040fa0be2bac
+# ╟─3464e994-1557-4280-979a-2da40ac2ac14
+# ╟─7ad9cc87-a71a-4dd1-bce0-de45320de000
+# ╟─44ff3522-ac51-4605-a0a2-7d79874e9516
+# ╟─806e7f6f-a9b8-466c-9ead-13090682369f
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
