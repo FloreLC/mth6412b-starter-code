@@ -176,8 +176,6 @@ function parcours_cycle(comp::AbstractComp, start_node::AbstractNode)
     return parcours
 end
 
-
-
 function parcours_cycle(g::Graph)
     parcours = Vector{Int}()
     prev = get_node(g, "s")
