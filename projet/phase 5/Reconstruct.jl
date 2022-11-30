@@ -12,9 +12,9 @@ picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filenam
 const TOUR_ALGO = ARGS[1]
 const READ = "pre"
 const STEP = [0.01, 0.05]
-const ADAPT = true
+const ADAPT = false
 const RAND_ROOT = true
-const TL = 60
+const TL = 1200
 const ALGO = kruskal
 ####################################################
 println("Parametres: ")

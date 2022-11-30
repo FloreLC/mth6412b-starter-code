@@ -47,7 +47,8 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
     incumbent = -Inf # starting lower bound
 
     # initial step size
-    step_size = rand(step[1]:0.1:step[2])
+    ##change step for rand back to 0.1
+    step_size = rand(step[1]:0.001:step[2])
 
     # initialize the counter for the iterations
     iter = 1
@@ -71,7 +72,7 @@ function lin_kernighan(graph::Graph{T}, algorithm::Function, root::Union{Nothing
         
         # construct the 1-tree and the degree of the nodes
         elapsed_time = time() - starting_time
-        if isnothing(root) || rand_root && elapsed_time <= max_time - 2
+        if isnothing(root) || rand_root && elapsed_time <= max_time - 10
             root_tmp = nodes(graph)[rand(1:nb_nodes(graph))]
             @show root_tmp
             one_tree, tree_comp, root_tmp = get_one_tree(Graph{T}("", nodes(graph), copy(edges(graph))), algorithm, root_tmp)
