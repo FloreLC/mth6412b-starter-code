@@ -3,8 +3,8 @@ include("../phase 1/graph.jl")
 include("../phase 4/RSL_module.jl")
 include("../phase 4/LK_module.jl")
 include("shredder-julia/bin/tools.jl")
-const PROJECT_PATH = "/Users/luisrojo/Library/CloudStorage/OneDrive-usach.cl/PhD/Courses_Polymtl/OR Algorithms/Laboratory/mth6412b-starter-code/projet"
-filename = "lower-kananaskis-lake"#ARGS[2]
+const PROJECT_PATH = "/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet"
+filename = "marlet2-radio-board"#ARGS[2]
 picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png")
 
 ####### LK PARAM ###################################
@@ -13,7 +13,7 @@ const READ = "pre"
 const STEP = [1.0, 1.0]
 const ADAPT = true
 const RAND_ROOT = true
-const TL = 600
+const TL = 300
 const ALGO = kruskal
 ####################################################
 println("Parametres: ")
@@ -59,32 +59,6 @@ if TOUR_ALGO == "HK"
     end
 end
 
-# # get the optimal tour
-
-# using TravelingSalesmanExact, GLPK
-
-# set_default_optimizer!(GLPK.Optimizer)
-# cities = [100*rand(2) for _ in 1:length(nodes(g))]
-
-# cost_matrix = zeros(length(nodes(g)), length(nodes(g)))
-
-# for edge in edges(g)
-#     n1, n2 = ends(edge)
-#     if data(n1) == data(n2)
-#         cost_matrix[data(n1) + 1, data(n2) + 1]
-#     else
-#         cost_matrix[data(n1) + 1, data(n2) + 1] = weight(edge)
-#         cost_matrix[data(n2) + 1, data(n1) + 1] = weight(edge)
-#     end
-# end
-
-# tour, cost = get_optimal_tour(cost_matrix, verbose = true)
-
-# tour = tour .- 1
-
-# write_tour(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_optimal.tour", tour, score_picture(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png"))
-# reconstruct_picture(PROJECT_PATH * "/phase 5/shredder-julia/tsp/tours/$(filename)_optimal.tour", PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png",
-#     PROJECT_PATH * "/phase 5/shredder-julia/images/reconstructed/$(filename)_optimal.png"; view = true)
 
 # ------------------------------------------------------------------ #
 # ------------------------ compute the tour ------------------------ #
