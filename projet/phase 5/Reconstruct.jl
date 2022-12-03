@@ -1,10 +1,11 @@
 # include required libraries
 include("../phase 1/graph.jl")
 include("../phase 4/RSL_module.jl")
-include("../phase 4/LK_module.jl")
+# include("../phase 4/LK_module.jl")
+include("../phase 4/LK_module_2.jl")
 include("shredder-julia/bin/tools.jl")
 const PROJECT_PATH = "/Users/luisrojo/Library/CloudStorage/OneDrive-usach.cl/PhD/Courses_Polymtl/OR Algorithms/Laboratory/mth6412b-starter-code/projet"
-filename = "lower-kananaskis-lake"#ARGS[2]
+filename = "blue-hour-paris"#ARGS[2]
 picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png")
 
 ####### LK PARAM ###################################
@@ -15,6 +16,7 @@ const ADAPT = true
 const RAND_ROOT = true
 const TL = 600
 const ALGO = kruskal
+
 ####################################################
 println("Parametres: ")
 @show TOUR_ALGO
@@ -60,7 +62,6 @@ if TOUR_ALGO == "HK"
 end
 
 # # get the optimal tour
-
 # using TravelingSalesmanExact, GLPK
 
 # set_default_optimizer!(GLPK.Optimizer)
@@ -113,7 +114,8 @@ if TOUR_ALGO == "RSL"
 elseif TOUR_ALGO == "HK"
     println("starting HK")
 
-    tour_lk, cost_lk, is_tour_lk, time_lk , tour_comp_lk, graph_modified_weight = lin_kernighan(g, ALGO, get_node(g,"s"), 1000000000, TL, STEP, ADAPT, RAND_ROOT)
+    # tour_lk, cost_lk, is_tour_lk, time_lk , tour_comp_lk, graph_modified_weight = lin_kernighan(g, ALGO, get_node(g,"s"), 1000000000, TL, STEP, ADAPT, RAND_ROOT)
+    tour_lk, cost_lk, is_tour_lk, time_lk , tour_comp_lk, graph_modified_weight = lin_kernighan(g, ALGO, get_node(g,"s"), 1000000000, TL, STEP)
 
     if !is_tour_lk
         to_remove = get_all_neighbours(tour_lk, get_node(tour_lk, "s"))
