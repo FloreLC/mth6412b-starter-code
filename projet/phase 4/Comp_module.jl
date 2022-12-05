@@ -7,8 +7,8 @@ abstract type AbstractComp{T} end
     - degrees represente les degres de chaque sommet. (K => V) = noeud => degre 
 """
 mutable struct Component{T} <: AbstractComp{T}
-    links::Dict{Node{T}, Node{T}}
-    degrees::Dict{Node{T}, Int}
+    links::Dict{String, String}
+    degrees::Dict{String, Int}
 end
 
 """
@@ -26,8 +26,8 @@ degrees(c::AbstractComp) = c.degrees
 Constructor for an elementary Component
 """
 function Component{T}() where T
-    links = Dict{Node{T}, Node{T}}()
-    degrees = Dict{Node{T}, Int}()
+    links = Dict{String, String}()
+    degrees = Dict{String, Int}()
     return Component{T}(links, degrees)
 end
 
@@ -46,14 +46,14 @@ end
 Gives back the degree of a node n in componant c
 """
 function degree(c::AbstractComp, n::Node{T}) where T
-    return degrees(c)[n]
+    return degrees(c)[name(n)]
 end
 
 """
 Met a jour le degre d'un noeud dans un arbre en construction. Si le noeud n'appartient pas a la composante, ajoute le noeud
 """
 function set_degree!(c::AbstractComp{T}, n::Node{T}, new_degree::Int64) where T
-    degrees(c)[n] = new_degree
+    degrees(c)[name(n)] = new_degree
     c
 end
 
@@ -61,8 +61,8 @@ end
 Incremente de 1 le degre d'un noeud dans un arbre en construction. Si le noeud n'appartient pas a la composante, ne fait rien 
 """
 function increase_degree!(c::AbstractComp{T}, n::Node{T}) where T
-    if haskey(degrees(c), n)
-        degrees(c)[n] = degrees(c)[n] + 1
+    if haskey(degrees(c), name(n))
+        degrees(c)[name(n)] = degrees(c)[name(n)] + 1
     end
     c
 end
@@ -78,9 +78,9 @@ end
 Ajoute une relation parent-enfant a une composante connexe, ie., mets a jour les degres 
 """
 function add_to_comp!(c::AbstractComp{T}, child::Node{T}, parent::Node{T}, deg::Int) where T
-    links(c)[child] = parent
-    if !haskey(degrees(c), child)
-        degrees(c)[child] = deg
+    links(c)[name(child)] = name(parent)
+    if !haskey(degrees(c), name(child))
+        degrees(c)[name(child)] = deg
         if deg > 0
             increase_degree!(c, parent)
         end
@@ -94,10 +94,10 @@ Prend en argument un graphe et renvoi un vecteur de composantes connexes initial
 function to_components(g::Graph{T}) where T
     tmp = Vector{Component{T}}()
     for n in nodes(g)
-        l = Dict{Node{T}, Node{T}}()
-        d = Dict{Node{T}, Int}()
-        l[n] = n
-        d[n] = 0
+        l = Dict{String, String}()
+        d = Dict{String, Int}()
+        l[name(n)] = name(n)
+        d[name(n)] = 0
         solo = Component{T}(l, d)
         push!(tmp, solo)
     end
@@ -110,7 +110,7 @@ Renvoi la composante connexe qui contient le noeud n
 """
 function get_component_with_node(tree::Vector{Component{T}}, n::Node{T}) where T
     for c in tree
-        if haskey(links(c), n)
+        if haskey(links(c), name(n))
             return c
         end
     end
@@ -140,18 +140,18 @@ Joins la composante connexe comp2 a la composante connexe comp1 en les liant au 
 """
 function add_nodes_at!(comp1::AbstractComp{T}, comp2::AbstractComp{T}, e::AbstractEdge{T}) where T
     new1, new2 = ends(e)
-    if haskey(links(comp1),new1)
+    if haskey(links(comp1),name(new1))
         # add starting node to the component
-        links(comp1)[new2] = new1
+        links(comp1)[name(new2)] = name(new1)
         ##################################################################
         # increases the degree for the nodes adjacents to the new edge e #
         ##################################################################   
         increase_degree!(comp1, new1)
         set_degree!(comp1, new2, degree(comp2, new2)+1) 
         remove_from_comp!(comp2, new2)
-    elseif haskey(links(comp1),new2)
+    elseif haskey(links(comp1),name(new2))
         # add destination node to the component
-        links(comp1)[new1] = new2 
+        links(comp1)[name(new1)] = name(new2) 
         ##################################################################
         # increases the degree for the nodes adjacents to the new edge e #
         ##################################################################
@@ -168,8 +168,8 @@ function parcours_cycle(comp::AbstractComp, start_node::AbstractNode)
     lin = links(comp1)
     current = start_node
     
-    while haskey(lin, current)
-        next = lin[current]
+    while haskey(lin, name(current))
+        next = lin[name(current)]
         push!(parcours, data(current))
         current = next
     end

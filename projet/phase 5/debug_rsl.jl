@@ -5,7 +5,6 @@ include("../phase 4/LK_module.jl")
 
 
 g = test_graph_complet()
-
-tour, poids, elapsed_time = rsl(g, get_node(g, "1"), prim, true)
-show(tour)
-@show parcours_cycle(tour)
+root = nodes(g)[1]
+tree, comp, r = get_one_tree(g, kruskal, root)
+@show nb_edges(tree)

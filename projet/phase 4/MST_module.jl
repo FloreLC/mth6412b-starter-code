@@ -13,20 +13,19 @@ function kruskal(g::Graph{T}) where T
     edges_selected = Vector{Edge{T}}()
     for e in edge_sorted
         (new1, new2) = ends(e)
-
         comp1 = get_component_with_node(tree_comps, new1)
         comp2 = get_component_with_node(tree_comps, new2)
-
+        # @show !isequal(comp1, comp2) && !isnothing(comp1) && !isnothing(comp2)
         if !isequal(comp1, comp2) && !isnothing(comp1) && !isnothing(comp2)
             push!(edges_selected, e)
-          
+       
             add_nodes_at!(comp1, comp2, e)
             ## add all elements of comp2 to comp1 except the node we attached already in the previous line
 
             filter!(x ->!isequal(x, comp2), tree_comps)
         end
     end
-
+    @show length(edges_selected)
     return Graph{T}("Kruskal de $(name(g))", nodes(g), edges_selected), tree_comps[1]
 end
 
@@ -126,22 +125,20 @@ function get_one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
     println("get one tree")
     # List the edges adjacents to the root
     to_remove = get_all_edges_with_node(g, root)
-
+    @show length(to_remove)
     # Creates a vector of all graph's node except the root 
     nodes_copy = nodes(g)[findall(x->name(x)!=name(root),nodes(g))]
    # Creates a vector of all graphs edges except the edges adjacent to the root 
-    edges_copy = filter(x -> !(x in to_remove), edges(g))
-
+   
+    edges_copy = Vector{Edge{T}}()
+    for e in edges(g)
+        if isnothing(findfirst(x -> isequal(x,e), to_remove))
+            push!(edges_copy, e)
+        end
+    end
     # Gets the MST tree and its corresponding connex component c for the subgraph g[V\{root}]
     tree , c = algorithm(Graph("", nodes_copy, edges_copy))
-    # Gets all the nodes with degree 1 in the MST tree
-
-    #### the degree should not be filtered to 1 degree nodes but anyone since
-    #### we need a cycle
-    leaves = filter(kv -> kv.second >= 0, degrees(c))
-
-    #edges_candidates = Vector{Edge{T}}()
-
+    println("In 1tree:")
     # Gather all the edges between root and the MST leaves
     # Order this edges by weight
     edge_sorted = sort(to_remove, by=weight)
@@ -154,7 +151,6 @@ function get_one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
     newly_added_to = Vector{Node{T}}() 
     for i in 1:2
         e = pop!(edge_sorted)
-   
         add_edge!(tree, e)
         u,v = ends(e)
         if name(u) == name(root)
@@ -166,13 +162,7 @@ function get_one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
         end
         
     end
-    degrees(c)[root] = 2
-    @show root
-    @show degrees(c)[root]
-    #node = pop!(newly_added_to)
-   # links(c)[root] = node
-    node = pop!(newly_added_to)
-    #links(c)[node] = root
+    @show nb_edges(tree), nb_nodes(tree)
     return tree, c, root
 end
 

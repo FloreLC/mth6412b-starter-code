@@ -168,8 +168,6 @@ return vec[i]
 end
 
 
-
-
 function get_associated_edges(g::AbstractGraph{T}, n::AbstractNode{T}) where T
   e_with_n = Vector{AbstractEdge{T}}()
   for e in edges(g)
@@ -207,4 +205,17 @@ function get_all_neighbours(g::Graph, n::Node)
     end
   end
   return neigh
+end
+
+
+function get_weight_of(g::Graph{Int}, tour::Vector{Int})
+  total_weight = 0
+  for i in 1:length(tour) - 1
+    total_weight += weight(get_edge(g, get_node(g, string(tour[i])), get_node(g, string(tour[i+1]))))
+  end
+  return convert(Float32,total_weight)
+end
+
+function get_degree(g::Graph, n::Node)
+  return length(get_associated_edges(g, n))
 end
