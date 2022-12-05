@@ -4,8 +4,8 @@ include("../phase 4/RSL_module.jl")
 include("../phase 4/LK_module.jl")
 include("shredder-julia/bin/tools.jl")
 const PROJECT_PATH = "/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet"
-filename = "blue-hour-paris
-"#ARGS[2]
+filename = "blue-hour-paris"
+#ARGS[2]
 picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png")
 
 ####### LK PARAM ###################################
@@ -14,7 +14,7 @@ const READ = "pre"
 const STEP = [1.0, 2.0]
 const ADAPT = true
 const RAND_ROOT = true
-const TL = 600
+const TL = 1200
 const ALGO = kruskal
 ####################################################
 println("Parametres: ")

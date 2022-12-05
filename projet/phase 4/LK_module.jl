@@ -19,6 +19,11 @@ function lk(graph::Graph{T}, algorithm::Function, root::Union{Nothing, Node{T}},
     tree_cost = 0
     dual_cost = 0
 
+    period = floor(length(nodes(graph)) / 2)
+    period_counter = 0
+    is_first_period = true
+    is_step_size_doubled = false
+
 
     # creates a dictionary that indicates the degree of each node in the 1-tree
     dict_pi = Dict{String, Float64}()
@@ -138,6 +143,37 @@ function lk(graph::Graph{T}, algorithm::Function, root::Union{Nothing, Node{T}},
 
             return one_tree, tree_cost, is_tour, elapsed_time, tree_comp, graph
         end
+
+
+         # update the step size
+         step_size = rand(step[1]:0.1:step[2]) / iter
+         period_counter = period_counter + 1 # increase the counter
+
+         # if we are at the first period and the incumbent has not impreved
+         if is_first_period && (incumbent[2] <= incumbent[1]) && !is_step_size_doubled
+             is_step_size_doubled = true
+             step_size = step_size * 2 
+         else
+          #  if in the last iteration the incumbent gets improved
+            if period_counter == period && (incumbent[1] < incumbent[2])
+                 step_size = step_size * 2 
+                 period = floor(period * 2)
+                 is_first_period = false # the forward iterations are no longer within the first period
+             elseif period_counter <= period
+                 step_size = step_size
+             else
+                 period_counter = 0 # reinitialize the period counter
+                 step_size = step_size / 2
+                 period = floor(period / 2)
+             end
+         end
+
+        @show step_size, period_counter, period
+
+         if step_size == 0 || period == 0
+             break
+         end
+
 
         for n in nodes(one_tree)
              dict_pi[name(n)] = dict_pi[name(n)] + step_size * (0.7*graph_degree[name(n)] + 0.3*graph_degree_prev[name(n)])
