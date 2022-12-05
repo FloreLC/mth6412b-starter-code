@@ -170,7 +170,7 @@ function parcours_cycle(comp::AbstractComp, start_node::AbstractNode)
     
     while haskey(lin, name(current))
         next = lin[name(current)]
-        push!(parcours, data(current))
+        push!(parcours,parse(Int, name(current)))
         current = next
     end
     return parcours
@@ -178,11 +178,11 @@ end
 
 function parcours_cycle(g::Graph)
     parcours = Vector{Int}()
-    prev = get_node(g, "s")
-    current = get_node(g, "s")
-    next = get_all_neighbours(g, get_node(g, "s"))[1]
-    while name(next) != "s"
-        push!(parcours, data(next))
+    prev = get_node(g, "1")
+    current = get_node(g, "1")
+    next = get_all_neighbours(g, get_node(g, "1"))[1]
+    while name(next) != "1"
+        push!(parcours, parse(Int, name(next)))
         prev = current
         current = next
         tmp = get_all_neighbours(g, current)
