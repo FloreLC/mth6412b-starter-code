@@ -1,5 +1,5 @@
 # include required libraries
-include("../phase 1/graph.jl")
+include("../phase 1/read_stsp.jl")
 include("../phase 4/RSL_module.jl")
 include("../phase 4/LK_module.jl")
 include("shredder-julia/bin/tools.jl")
@@ -11,7 +11,7 @@ picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filenam
 ####### LK PARAM ###################################
 const TOUR_ALGO = "HK"#ARGS[1]
 const READ = "pre"
-const STEP = [1.0, 2.0]
+const STEP = [1.0, 20.0]
 const ADAPT = true
 const RAND_ROOT = true
 const TL = 1200
@@ -28,34 +28,34 @@ end
 @show ALGO
 @show filename
 
-# create the object
-g = Graph{Int}(filename, Vector{Node}(), Vector{Edge}())
+# # create the object
+# g = Graph{Int}(filename, Vector{Node}(), Vector{Edge}())
 
-for i in 1:size(picture, 2)
-    add_node!(g, Node(string(i), i))
-end
+# for i in 1:size(picture, 2)
+#     add_node!(g, Node(string(i), i))
+# end
 
-if TOUR_ALGO == "HK"
-    # add –fake– node as a source
-    add_node!(g, Node("s", 0))
+# if TOUR_ALGO == "HK"
+#     # add –fake– node as a source
+#     add_node!(g, Node("s", 0))
 
-    # considers each column as a node
-    for i in 1:size(picture, 2)
-        # add the zero weight from the -fake- source to each node
-        add_edge!(g, Edge((get_node(g, "s"), get_node(g, string(i))), 0.0))
+#     # considers each column as a node
+#     for i in 1:size(picture, 2)
+#         # add the zero weight from the -fake- source to each node
+#         add_edge!(g, Edge((get_node(g, "s"), get_node(g, string(i))), 0.0))
 
-        # the the edge to between other nodes
-        for j in i:size(picture, 2)
-            # compute the weight of the edge and add the edge
-            # as the matrix is symmetric, then skip the lower triangular matrix as well as the diagonal
-            computed_weight = convert(Float64,compare_columns(picture[:,i], picture[:,j]))
-                # add the edge
-            add_edge!(g, Edge((get_node(g,string(i) ), get_node(g, string(j))), computed_weight))
-        end
-    end
-end
+#         # the the edge to between other nodes
+#         for j in i:size(picture, 2)
+#             # compute the weight of the edge and add the edge
+#             # as the matrix is symmetric, then skip the lower triangular matrix as well as the diagonal
+#             computed_weight = convert(Float64,compare_columns(picture[:,i], picture[:,j]))
+#                 # add the edge
+#             add_edge!(g, Edge((get_node(g,string(i) ), get_node(g, string(j))), computed_weight))
+#         end
+#     end
+# end
 
-
+g = build_graph(PROJECT_PATH * "/phase 5/shredder-julia/tsp/instances/$(filename).tsp")
 # ------------------------------------------------------------------ #
 # ------------------------ compute the tour ------------------------ #
 # ------------------------------------------------------------------ #

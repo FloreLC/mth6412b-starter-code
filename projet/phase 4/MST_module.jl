@@ -90,9 +90,11 @@ Retourne toutes les aretes du graphe incidente au noeud
 function get_all_edges_with_node(g::Graph{T}, node::Node{T}) where T
     edges = Vector{Edge{T}}()
     for n in nodes(g)
-        e = get_edge(g, node, n)
-        if !isnothing(e)
-            push!(edges,e)
+        if name(n) != name(node)
+            e = get_edge(g, node, n)
+            if !isnothing(e)
+                push!(edges,e)
+            end
         end
     end
    return edges
@@ -141,8 +143,16 @@ function get_one_tree(g::Graph{T}, algorithm::Function, root::Node{T}) where T
     println("In 1tree:")
     # Gather all the edges between root and the MST leaves
     # Order this edges by weight
-    edge_sorted = sort(to_remove, by=weight)
-
+    #edge_sorted = sort(to_remove, by=weight)
+    candidates = Vector{Edge{T}}()
+    for n in nodes(tree)
+        if get_degree(tree, n) == 1
+            cand = get_edge_in_list(to_remove, n, root)
+            push!(candidates, cand)
+        end
+    end
+    @show length(candidates)
+    edge_sorted = sort(candidates, by=weight)
     # Add the root and 2 cheapest arcs from the root to a leaf
     # Keep the component c updated
     # ATTENTION: from now on, because the tree is now a 1-tree, the component c does not contain the information for the edges touching root. 
