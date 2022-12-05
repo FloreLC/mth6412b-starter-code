@@ -4,7 +4,7 @@ include("../phase 4/RSL_module.jl")
 include("../phase 4/LK_module.jl")
 include("shredder-julia/bin/tools.jl")
 const PROJECT_PATH = "/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet"
-filename = "marlet2-radio-board"
+filename = "nikos-cat"
 #ARGS[2]
 picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png")
 
