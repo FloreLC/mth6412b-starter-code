@@ -4,14 +4,14 @@ include("../phase 4/RSL_module.jl")
 include("../phase 4/LK_module.jl")
 include("shredder-julia/bin/tools.jl")
 const PROJECT_PATH = "/Users/flore/Desktop/Cours/MTH6412B/Projet/mth6412b-starter-code/projet"
-filename = "tokyo-skytree-aerial"
+filename = "blue-hour-paris"
 #ARGS[2]
 picture = load(PROJECT_PATH * "/phase 5/shredder-julia/images/shuffled/$(filename).png")
 
 ####### LK PARAM ###################################
 const TOUR_ALGO = "HK"#ARGS[1]
 const READ = "pre"
-const STEP = [1.0, 10.0]
+const STEP = [1.0, 150.0]
 const ADAPT = true
 const RAND_ROOT = true
 const TL = 300
@@ -95,7 +95,7 @@ elseif TOUR_ALGO == "HK"
     else
         tour_lk_array = Vector{Int}()
         neigh = get_all_neighbours(tour_lk, get_node(g, "1"))
-        tour_lk_array = parcours_cycle(tour_comp_lk, neigh[1])
+        tour_lk_array = parcours_cycle(tour_lk) .-1
     end
 
     #our_weight = get_weight_of(g, tour_lk_array)
